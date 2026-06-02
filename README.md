@@ -4,21 +4,16 @@
 
 ## 目录结构
 
-| 目录 | 用途 |
-|------|------|
-| `skills/` | 核心技能 |
-| `references/` | 通用规范与参考资料 |
-| `spec/` | 本仓库的设计规范 |
-
-## 使用方式
-
-所有 skill 均为纯文本 `SKILL.md`，任何支持文件读取的 AI 平台均可手动加载。
-
-| 平台 | 加载方式 |
-|------|---------|
-| Claude Code | `/load skills/<name>/SKILL.md` 或复制内容到对话 |
-| Claude.ai Projects | 上传 skill 文件到项目知识库 |
-| ChatGPT / Gemini / Cursor 等 | 复制内容作为 system prompt 或对话上下文 |
+```
+yoing-skills/
+├── skills/                  # 核心技能
+│   ├── agents-guide/        # 生成项目根目录级 AI 助手指南（AGENTS.md）
+│   ├── module-agents-guide/ # 生成模块级 AI 助手指南（AGENTS_<模块名>.md）
+│   ├── module-context/      # 深入了解项目中某个具体模块的上下文、源码和依赖
+│   └── project-context/     # 快速获取项目架构、规范、技术栈和工作方式
+├── references/              # 通用规范与参考资料
+├── spec/                    # 本仓库的设计规范
+```
 
 ## 设计规范
 
