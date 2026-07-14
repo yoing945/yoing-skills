@@ -1,9 +1,14 @@
-#.claude/
 **/*.local.json
+**/*.local.md
+**/*.local.yaml
+**/*.local.toml
 
-*.local.md
+# Python
+**/.venv/
+**/*.egg-info/
+**/uv.lock
 
-# AI 工作流中间产物（design doc、plan 等），个人工作流辅助文件，不进入 git
+# AI 工作流中间产物（design doc、plan 等）
 docs/ai-workflow/
 
 # 临时翻译/实验目录

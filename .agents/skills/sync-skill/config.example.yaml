@@ -1,0 +1,9 @@
+config:
+  target_path: "example path"
+  skills:
+    - init-agents
+    - init-module-agents
+    - module-context
+    - project-context
+  prompts:
+    - CODING
