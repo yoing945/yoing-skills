@@ -1,8 +1,7 @@
 config:
   target_path: "example path"
   skills:
-    - init-agents
-    - init-module-agents
+    - agents-guide
     - module-context
     - project-context
   prompts:
