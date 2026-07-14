@@ -4,5 +4,6 @@ config:
     - agents-guide
     - module-context
     - project-context
+    - preview-skill
   prompts:
     - CODING

@@ -5,6 +5,7 @@ description = "Sync skills and prompts to target project"
 requires-python = ">=3.9"
 dependencies = [
     "pyyaml",
+    "pathspec",
 ]
 
 [project.scripts]

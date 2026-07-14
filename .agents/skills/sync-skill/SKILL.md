@@ -15,6 +15,7 @@ description: 根据配置文件将本项目中指定的 skills、prompts 复制�
 
 - Python 3
 - PyYAML
+- pathspec
 
 ## 初始化
 
@@ -60,7 +61,10 @@ config:
 配置项说明：
 
 - `target_path`：目标工程目录的绝对路径
-- `skills`：要同步的 skill 名称列表（对应本项目 `skills/` 下的子目录名）
+- `skills`：要同步的 skill 名称列表。脚本会按以下顺序查找源目录：
+  1. 项目根目录 `skills/<skill-name>/`
+  2. 项目根目录 `.agents/skills/<skill-name>/`
+  找到后按原始相对路径复制到目标工程（例如 `.agents/skills/` 下的 skill 会同步到目标工程的 `.agents/skills/` 下）
 - `prompts`：要同步的 prompt 文件名列表（不带 `.md` 后缀，对应本项目 `prompts/` 下的文件）
 
 ## 触发场景
@@ -88,7 +92,8 @@ config:
    - 使用 pip（需先激活虚拟环境）：`python scripts/main.py`
 4. 脚本会自动完成以下操作：
    - 读取 `config.local.yaml`
-   - 删除并重新复制目标 skill 目录
+   - 按项目根目录 `.gitignore` 排除被忽略的文件
+   - 删除并重新复制目标 skill 目录（保持源目录结构）
    - 覆盖目标 prompt 文件
    - 验证目标与源完全一致
 
@@ -102,6 +107,8 @@ config:
 ## 注意事项
 
 - 本 skill 执行完全覆盖，删除操作前需再次确认
+- 同步时排除项目根目录 `.gitignore` 中匹配的文件
+- skill 会保持原始目录结构同步（`skills/` 或 `.agents/skills/`）
 - 配置文件中的 `prompts` 项不带 `.md` 后缀，执行时自动补全
 - 仅同步配置文件中列出的 skill 和 prompt
 - 不自动处理依赖关系

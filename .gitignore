@@ -10,6 +10,8 @@
 
 # AI 工作流中间产物（design doc、plan 等）
 docs/ai-workflow/
+docs/superpowers/
 
 # 临时翻译/实验目录
 temp/
+.agents/skills/test
