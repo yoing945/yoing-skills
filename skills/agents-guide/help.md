@@ -1,0 +1,31 @@
+# agents-guide
+
+为指定目录生成渐进式项目地图文档。
+
+## 用法
+
+```text
+agents-guide [path] [options]
+```
+
+- 不带 `path`：在项目边界根目录生成/更新 `AGENTS.md`。
+- 带 `path`：在指定目录生成/更新模块指南，并向上回写父级文档导航。
+
+## 选项
+
+```text
+agents-guide --help                          # 显示帮助信息
+agents-guide --dry-run [path]                # 预览生成结果，不写入文件
+agents-guide --depth N [path]                # 控制 ## 目录结构 的索引深度，默认 3
+agents-guide --init-override [path]          # 创建 agents.guide.override.md 模板
+agents-guide --init-override --dry-run [path] # 预览 override 模板，不创建文件
+```
+
+## 示例
+
+```text
+agents-guide              # 生成 AGENTS.md
+agents-guide prompts      # 生成 prompts/AGENTS.md
+agents-guide --dry-run src/payment  # 预览 src/payment/AGENTS.md
+```
+

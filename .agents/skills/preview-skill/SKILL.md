@@ -1,13 +1,13 @@
 ---
 name: preview-skill
-description: 当需要预览或验证项目 skills/ 目录下的 skill 时，将其复制到 .agents/skills/test/ 目录进行隔离，避免影响已安装的 skill。
+description: 当需要预览或验证项目 skills/ 目录下的 skill 时，将其复制到 .agents/skills/tests/ 目录进行隔离，避免影响已安装的 skill。
 ---
 
 # Preview Skill
 
 ## 概述
 
-将项目根目录 `skills/` 下的指定 skill 复制到 `.agents/skills/test/` 目录，用于在隔离环境中验证 skill 行为。
+将项目根目录 `skills/` 下的指定 skill 复制到 `.agents/skills/tests/` 目录，用于在隔离环境中验证 skill 行为。
 
 ## 何时使用
 
@@ -19,9 +19,9 @@ description: 当需要预览或验证项目 skills/ 目录下的 skill 时，将
 
 1. **确认目标 skill** — 用户指定 `skills/` 下的 skill 名称
 2. **检查源目录** — 确认 `skills/<skill-name>/SKILL.md` 存在
-3. **准备测试目录** — 确保 `.agents/skills/test/` 存在
-4. **复制 skill** — 将 `skills/<skill-name>/` 完整复制到 `.agents/skills/test/<skill-name>/`
-5. **验证复制结果** — 确认 `.agents/skills/test/<skill-name>/SKILL.md` 存在
+3. **准备测试目录** — 确保 `.agents/skills/tests/` 存在
+4. **复制 skill** — 将 `skills/<skill-name>/` 完整复制到 `.agents/skills/tests/<skill-name>/`
+5. **验证复制结果** — 确认 `.agents/skills/tests/<skill-name>/SKILL.md` 存在
 6. **告知用户** — skill 已可用于测试加载
 
 ## 依赖
@@ -31,6 +31,7 @@ description: 当需要预览或验证项目 skills/ 目录下的 skill 时，将
 当前依赖：
 
 - Python 3
+- pathspec
 
 ## 初始化
 
@@ -68,6 +69,7 @@ python scripts/main.py <skill-name>
 
 ## 注意事项
 
-- 完全覆盖 `.agents/skills/test/` 下的同名 skill
+- 完全覆盖 `.agents/skills/tests/` 下的同名 skill
 - 不修改源 skill 目录
-- 测试完成后建议清理 `.agents/skills/test/`
+- 复制时排除项目根目录 `.gitignore` 中匹配的文件和目录（如 `.venv/`、`.pytest_cache/`、`__pycache__/`）
+- 测试完成后建议清理 `.agents/skills/tests/`
