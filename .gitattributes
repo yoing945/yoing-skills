@@ -1,0 +1,2 @@
+# 确保 skillshare 读取 .skillignore 时不会因 CRLF 导致规则失效
+.skillignore text eol=lf
