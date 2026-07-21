@@ -29,4 +29,5 @@ yoing-skills/
 
 | 名称 | 类型 | 说明 |
 |---|---|---|
-| [README](README.md) | leaf | 项目目标、目录结构、使用方式 |
+| [prompts](prompts/AGENTS.md) | guide | AI 行为与编码提示词 |
+| [README](README.md) | leaf | 项目目标与主要技能 |
