@@ -70,8 +70,11 @@ description: <一句话中文描述>
     # .venv/bin/python -m pip install -e .     # Linux/macOS
     ```
 - 当用户请求帮助时，直接读取 skill 目录下的 `help.md`。
-- 读取 `agents.guide.override.md`（如存在），解析 `## 目录结构` / `## 文档导航` 章节，分别提取 tree/docs 所需的 include/exclude 列表。
-- 调用 Python 扫描脚本获取目录结构和文档信息（传入排除列表）。
+- 调用 Python 扫描脚本获取目录结构和文档信息。
+- 检查目标目录是否已存在 guide 文档（带 `agents-guide: true` 的 `AGENTS.md`）：
+  - 若存在，默认执行**增量更新**：保留 frontmatter 和用户自定义章节，仅刷新 `## 目录结构` 和 `## 文档导航`。
+  - 若不存在（文件缺失，或现有 `AGENTS.md` 没有 `agents-guide: true`），按空白模板生成新 guide。
+  - **完全覆盖**（删除自定义章节、重写 frontmatter）仅在用户显式声明时执行。
 - 生成完整 `AGENTS.md`。
 - 更新父级 guide 文档导航（如适用）。
 - 写入文件或返回 dry-run 内容。
@@ -79,18 +82,21 @@ description: <一句话中文描述>
 ### 生成流程
 
 1. 确定目标目录和项目边界。
-2. 读取 `agents.guide.override.md`（如存在），按章节解析为 `tree` / `docs` 两组 `include` / `exclude` 数组（详见 [`rules/override.md`](rules/override.md)）。
-3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...`（参数来自 `## 目录结构` 章节）获取目录结构 JSON。
-4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <文件2> ...`（参数来自 `## 文档导航` 章节）获取 guide/leaf 文档 JSON。
-5. 调用一次 LLM，传入：
+2. Python 扫描脚本读取目标目录下的 `.agents-guide.yaml`（如存在），按 `tree` / `docs` 键解析为两组 `include` / `exclude` 数组，并与 CLI 参数合并（详见 [`rules/override.md`](rules/override.md)）。
+3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...` 获取目录结构 JSON。
+4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <文件2> ...` 获取 guide/leaf 文档 JSON。
+5. 检查目标目录是否已有 guide 文档：
+   - 若有，读取并解析现有 `AGENTS.md`，保留 frontmatter 与 `## 目录结构`、`## 文档导航` 之外的自定义章节。
+   - 若无，使用空白模板。
+6. 调用一次 LLM，传入：
    - 目录树 JSON
    - 文档列表 JSON
-   - override 的 include/exclude 规则
+   - 需要保留的现有内容（如适用）
    - 生成规则（概述、目录结构、文档导航的要求）
-6. 返回完整 `AGENTS.md` 内容。
-7. 做基础格式检查（frontmatter 存在、必要章节存在）。
-8. `--dry-run` 模式下返回生成内容；正常执行模式下写入 `AGENTS.md`。
-9. 若目标目录不是项目根，更新父级 guide 文档的导航。
+7. 返回完整 `AGENTS.md` 内容。
+8. 做基础格式检查（frontmatter 存在、必要章节存在）。
+9. `--dry-run` 模式下返回生成内容；正常执行模式下写入 `AGENTS.md`。
+10. 若目标目录不是项目根，更新父级 guide 文档的导航。
 
 ### 父级查找算法
 
@@ -115,6 +121,7 @@ description: <一句话中文描述>
 
 展示结果前，按以下清单自检：
 
+- [ ] **更新模式检查**：目标目录已有 guide 文档时，确认保留自定义章节；完全覆盖需用户明确声明
 - [ ] **frontmatter 检查**：必须包含 `agents-guide: true`；`name`、`description` 按规则填写
 - [ ] **章节检查**：只生成必要的章节，不强求三节；无用户明确要求时不写入技术栈、架构、编码规范、测试、依赖、注意事项等章节
 - [ ] **真实性检查**：文档导航中引用的文件真实存在

@@ -25,7 +25,7 @@
   }
   ```
 - `--depth` 参数值。
-- `agents.guide.override.md` 全局规则区中的 `exclude` 规则。
+- `.agents-guide.yaml` 中 `tree` 章节的 `exclude` 规则。
 
 ## 输出格式
 

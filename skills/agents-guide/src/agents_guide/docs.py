@@ -10,9 +10,7 @@ from agents_guide.gitignore import collect_gitignore_rules, is_ignored, merge_ex
 DOC_SUFFIX = ".md"
 
 # 默认排除的文件名（不纳入文档导航）
-DEFAULT_EXCLUDE_NAMES = {
-    "agents.guide.override.md",
-}
+DEFAULT_EXCLUDE_NAMES = set()
 
 # 默认额外扫描的目录（非递归），这些目录下的 .md 文件也作为 leaf 纳入
 DEFAULT_INCLUDE_DOC_DIRS = {
@@ -202,5 +200,5 @@ def scan_docs(
         "target_dir": str(target_dir),
         "guides": guides,
         "leafs": leafs,
-        "override_exists": (target_dir / "agents.guide.override.md").exists(),
+        "override_exists": (target_dir / ".agents-guide.yaml").exists(),
     }

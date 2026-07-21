@@ -5,6 +5,7 @@ description = "agents-guide skill helper CLI"
 requires-python = ">=3.9"
 dependencies = [
     "pathspec",
+    "pyyaml",
 ]
 
 [project.scripts]

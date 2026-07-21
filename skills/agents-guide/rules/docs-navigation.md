@@ -17,8 +17,8 @@
 - **guide**：当前目录下及直接子目录下真实存在的 guide 文档。
 - **leaf**：当前目录下真实存在的普通 `.md` 文件。
 - 排除当前正在生成的 guide 文档本身。
-- 排除 `agents.guide.override.md`。
-- 结合 `agents.guide.override.md` 全局规则区中的 `include`/`exclude`。
+- 排除 `.agents-guide.yaml`。
+- 结合 `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude`。
 
 ## 输入
 
@@ -38,7 +38,7 @@
     "override_exists": false
   }
   ```
-- `agents.guide.override.md` 全局规则区中的 `include`/`exclude` 规则。
+- `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude` 规则。
 
 ## 输出格式
 
