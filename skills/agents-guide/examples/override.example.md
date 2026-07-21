@@ -1,12 +1,21 @@
-# 覆盖规则示例
+## 目录结构
 
-排除目录 temp/ 和 build/。
-强制将 README.md 纳入文档导航。
+include:
+  - example_path1/
+  - example_path2/sub_path/
 
-## 关键约定
+exclude:
+  - example_path_a/
+  - example_path_b/sub_path/
 
-根据 prompts/CODING.md 和 prompts/CHAT.md，总结本项目 AI 交互与编码的核心约定，用 bullet 列表呈现。
 
-## 注意事项
+## 文档导航
 
-列出 skill 目录下每个子目录的命名规范，以及新增 skill 时应遵循的步骤。
+include:
+  - example_markdown.md
+  - example_excel.xlsx
+  - example_path/doc.md
+
+exclude:
+  - example_ex_markdown.md
+

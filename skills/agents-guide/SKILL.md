@@ -70,7 +70,7 @@ description: <一句话中文描述>
     # .venv/bin/python -m pip install -e .     # Linux/macOS
     ```
 - 当用户请求帮助时，直接读取 skill 目录下的 `help.md`。
-- 读取 `agents.guide.override.md`（如存在），调用 LLM 解析全局规则区，提取需要排除的目录/文件列表。
+- 读取 `agents.guide.override.md`（如存在），解析 `## 目录结构` / `## 文档导航` 章节，分别提取 tree/docs 所需的 include/exclude 列表。
 - 调用 Python 扫描脚本获取目录结构和文档信息（传入排除列表）。
 - 生成完整 `AGENTS.md`。
 - 更新父级 guide 文档导航（如适用）。
@@ -79,15 +79,15 @@ description: <一句话中文描述>
 ### 生成流程
 
 1. 确定目标目录和项目边界。
-2. 读取 `agents.guide.override.md`（如存在），调用 LLM 解析全局规则区，输出 JSON 格式的 `exclude` / `include` 数组（详见 [`rules/override.md`](rules/override.md)）。
-3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...` 获取目录结构 JSON。
-4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <目录2> ...` 获取 guide/leaf 文档 JSON。
+2. 读取 `agents.guide.override.md`（如存在），按章节解析为 `tree` / `docs` 两组 `include` / `exclude` 数组（详见 [`rules/override.md`](rules/override.md)）。
+3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...`（参数来自 `## 目录结构` 章节）获取目录结构 JSON。
+4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <文件2> ...`（参数来自 `## 文档导航` 章节）获取 guide/leaf 文档 JSON。
 5. 调用一次 LLM，传入：
    - 目录树 JSON
    - 文档列表 JSON
    - override 的 include/exclude 规则
    - 生成规则（概述、目录结构、文档导航的要求）
-6. LLM 返回完整 `AGENTS.md` 内容。
+6. 返回完整 `AGENTS.md` 内容。
 7. 做基础格式检查（frontmatter 存在、必要章节存在）。
 8. `--dry-run` 模式下返回生成内容；正常执行模式下写入 `AGENTS.md`。
 9. 若目标目录不是项目根，更新父级 guide 文档的导航。

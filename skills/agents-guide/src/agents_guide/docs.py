@@ -94,12 +94,18 @@ def scan_docs(
 
     include_names: set[str] = set()
     include_dirs: set[str] = set()
+    include_files: set[str] = set()
     if include:
         for p in include:
-            if "/" in p or "\\" in p:
-                include_dirs.add(p.rstrip("/"))
+            # 优先按文件系统实际类型判断文件/目录；不存在时回退到路径形态推断
+            normalized = p.replace("\\", "/")
+            stripped = normalized.rstrip("/")
+            if normalized.endswith("/") or (target_dir / stripped).is_dir():
+                include_dirs.add(stripped)
+            elif "/" in normalized:
+                include_files.add(normalized)
             else:
-                include_names.add(p)
+                include_names.add(normalized)
 
     # include 可覆盖默认排除的文件名
     default_exclude = DEFAULT_EXCLUDE_NAMES - include_names
@@ -176,6 +182,16 @@ def scan_docs(
                 "source": "subdirectory",
                 "frontmatter": fm,
             })
+
+    # include 显式列出的文件（含非 .md 文件）：验证存在后纳入 leaf
+    discovered = {g["rel_path"] for g in guides} | {l["rel_path"] for l in leafs}
+    for rel in sorted(include_names | include_files):
+        if rel in discovered:
+            continue
+        f = target_dir / rel
+        if not f.is_file():
+            continue
+        leafs.append({"name": f.stem, "rel_path": rel})
 
     # 排序
     guides.sort(key=lambda g: (0 if g["source"] == "current" else 1, g["name"]))

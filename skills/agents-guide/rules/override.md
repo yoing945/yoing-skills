@@ -4,47 +4,57 @@
 
 ## 文件格式
 
-```markdown
-# 覆盖规则
+文件由两个可选章节组成，分别对应 `tree` 和 `docs` 两次扫描：
 
-排除目录 temp/。
-强制将 README.md 纳入文档导航。
+```markdown
+## 目录结构
+
+include:
+  - .agents/
+  - src/core/
+
+exclude:
+  - temp/
+
+## 文档导航
+
+include:
+  - CHANGELOG.md
+  - assets/spec.xlsx
+
+exclude:
+  - DRAFT.md
 ```
 
 规则说明：
 
-- 文件开头到第一个 `##` 标题之前的内容为**全局规则区**。
-- 全局规则区可以包含一个 `#` 一级标题作为文件标题（如 `# 覆盖规则`），该标题仅用于说明，不参与规则解析。
-- 只识别全局规则区，不识别 `##` 等章节生成指令。
-- 如果全局规则区为空且没有 `##` 标题，视为空 override，不修改 `AGENTS.md`。
+- 两个章节均可省略；文件为空或没有任何章节时，视为空 override，不修改生成结果。
+- 每个章节下使用 YAML 风格的 `include:` / `exclude:` 列表，两者均可省略。
+- 路径相对于目标目录；目录建议以 `/` 结尾（实际存在的目录不加也能识别），文件直接写文件名或相对路径。
+- `## 目录结构` 的规则传给 `agents-guide tree --include/--exclude`。
+- `## 文档导航` 的规则传给 `agents-guide docs --include/--exclude`；include 显式列出的文件可以是任意格式（如 `.xlsx`），脚本验证文件存在后纳入 leaf。
 
 ## 覆盖规则
 
-全局规则区使用自然语言表达 `include`/`exclude` 等规则，例如：
-
-- "排除目录 temp/"
-- "强制包含 README.md"
-- "忽略 .agents/ 目录"
-
-`agents-guide` 通过自然语言理解这些规则，并应用到默认生成过程中。规则优先级高于默认规则，即 **override > 默认**。
+override 规则的优先级高于默认规则，即 **override > 默认**。
 
 `agents.guide.override.md` 不是 guide 文档，不计入“一个目录最多一份指引文档”的限制。
 
 ## LLM 解析格式约束
 
-当前会话读取 `agents.guide.override.md` 后，必须调用 LLM 将全局规则区解析为结构化 JSON，格式如下：
+当前会话读取 `agents.guide.override.md` 后，必须将其解析为结构化 JSON，格式如下：
 
 ```json
 {
-  "exclude": ["temp/", "docs/", "README.md"],
-  "include": [".agents/", "CHANGELOG.md"]
+  "tree": {"include": [".agents/"], "exclude": ["temp/"]},
+  "docs": {"include": ["CHANGELOG.md"], "exclude": ["DRAFT.md"]}
 }
 ```
 
-- `exclude`：需要排除的目录或文件列表，用于传给 `agents-guide tree/docs --exclude` 参数。
-- `include`：需要强制包含的目录或文件列表，用于覆盖默认排除规则（如隐藏目录 `.agents/`、默认排除的文件名等）。
-- 目录以 `/` 结尾（如 `temp/`、`.agents/`），文件直接写文件名（如 `README.md`）。
-- 若全局规则区为空或无法解析，返回 `{"exclude": [], "include": []}`。
+- `tree`：对应 `## 目录结构` 章节，传给 `agents-guide tree --include/--exclude`。
+- `docs`：对应 `## 文档导航` 章节，传给 `agents-guide docs --include/--exclude`。
+- 目录以 `/` 结尾（如 `temp/`、`.agents/`），文件直接写文件名或相对路径（如 `README.md`、`assets/spec.xlsx`）。
+- 章节不存在或列表为空时，对应数组为 `[]`；文件为空或无法解析时，`tree` 和 `docs` 均为空 include/exclude。
 
 **规则优先级**：`include` > 默认排除规则 > `exclude` > `.gitignore`。
 

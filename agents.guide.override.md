@@ -1,5 +1,4 @@
-# 覆盖规则
+## 目录结构
 
-- 包含 .agents/ 目录。
-
-
+include:
+  - .agents/
