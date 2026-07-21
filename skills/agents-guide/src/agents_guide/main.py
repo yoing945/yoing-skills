@@ -20,10 +20,13 @@ def main(argv: Any = None) -> int:
     tree_parser = subparsers.add_parser("tree", help="扫描目录结构")
     tree_parser.add_argument("--target", required=True, type=Path)
     tree_parser.add_argument("--depth", type=int, default=3)
+    tree_parser.add_argument("--exclude", action="append", default=[], help="排除目录/文件，可多次指定")
+    tree_parser.add_argument("--include", action="append", default=[], help="强制包含目录/文件，可多次指定")
 
     docs_parser = subparsers.add_parser("docs", help="发现 guide/leaf 文档")
     docs_parser.add_argument("--target", required=True, type=Path)
-    docs_parser.add_argument("--exclude", default=None)
+    docs_parser.add_argument("--exclude", action="append", default=[], help="排除目录/文件，可多次指定")
+    docs_parser.add_argument("--include", action="append", default=[], help="强制包含目录/文件，可多次指定")
 
     args = parser.parse_args(argv)
 
@@ -39,9 +42,9 @@ def main(argv: Any = None) -> int:
     project_root = find_project_root(target)
 
     if args.command == "tree":
-        data = scan_tree(target, args.depth, project_root)
+        data = scan_tree(target, args.depth, project_root, exclude=args.exclude, include=args.include)
     elif args.command == "docs":
-        data = scan_docs(target, project_root, exclude=args.exclude)
+        data = scan_docs(target, project_root, exclude=args.exclude, include=args.include)
     else:
         parser.print_help()
         return 1

@@ -56,60 +56,66 @@ description: <一句话中文描述>
 
 从目标路径出发向上查找，遇到包含 `.git` 目录的目录即为项目边界。若一直未遇到 `.git` 目录，则以目标目录自身作为项目边界。
 
-## 生成流程
-
-`agents-guide` 的实际生成工作由**主 subagent** 在干净上下文中独立完成。当前会话只负责解析命令、启动主 subagent、展示结果；所有文件扫描、override 解析、内容生成、父级导航更新和文件写入均由主 subagent 完成。
-
-1. 确定目标目录。
-2. 确定项目边界（Git 仓库根或目标目录自身）。
-3. 检查目标目录下是否已存在 guide 文档：
-   - 若存在，读取并准备更新。
-   - 若不存在，按默认规则创建新文件 `AGENTS.md`。
-4. 读取 `agents.guide.override.md`（如存在）：
-   - 将文件开头到第一个 `##` 标题之前的内容作为**全局规则区**。
-   - 将每个 `## 标题` 及其正文作为一个**章节生成指令**。
-5. 并行派生子 subagent 生成章节：
-   - `tree-agent` 基于 `agents-guide tree` 输出生成 `## 目录结构`。
-   - `docs-agent` 基于 `agents-guide docs` 输出生成 `## 文档导航`。
-6. 主 subagent 合并两章结果，确保 Markdown 层级、frontmatter、链接格式一致。
-7. 派生 `review-agent` 对合并后的 `AGENTS.md` 草案进行生成后自检。
-8. 若目标目录不是项目根，向上查找父级 guide 文档并更新其文档导航。
-9. 写入文件。
-
 ## 执行架构
 
-详见 [`rules/architecture.md`](rules/architecture.md)。
+### 会话职责
 
-## 目录结构生成规则
+- 解析用户输入的命令和参数。
+- 确保 Python 扫描脚本可用：
+  - 尝试运行 `agents-guide` 验证命令/Python 环境是否可用（不带参数时输出 argparse 默认帮助即表示可用）。
+  - 若命令不可用（命令不存在或无法执行），在当前 skill 被加载的目录执行以下命令完成安装：
+    ```bash
+    python -m venv .venv
+    .venv/Scripts/python -m pip install -e .   # Windows
+    # .venv/bin/python -m pip install -e .     # Linux/macOS
+    ```
+- 当用户请求帮助时，直接读取 skill 目录下的 `help.md`。
+- 读取 `agents.guide.override.md`（如存在），调用 LLM 解析全局规则区，提取需要排除的目录/文件列表。
+- 调用 Python 扫描脚本获取目录结构和文档信息（传入排除列表）。
+- 生成完整 `AGENTS.md`。
+- 更新父级 guide 文档导航（如适用）。
+- 写入文件或返回 dry-run 内容。
 
-详见 [`rules/tree-generation.md`](rules/tree-generation.md)。
+### 生成流程
 
-## 文档导航生成规则
+1. 确定目标目录和项目边界。
+2. 读取 `agents.guide.override.md`（如存在），调用 LLM 解析全局规则区，输出 JSON 格式的 `exclude` / `include` 数组（详见 [`rules/override.md`](rules/override.md)）。
+3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...` 获取目录结构 JSON。
+4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <目录2> ...` 获取 guide/leaf 文档 JSON。
+5. 调用一次 LLM，传入：
+   - 目录树 JSON
+   - 文档列表 JSON
+   - override 的 include/exclude 规则
+   - 生成规则（概述、目录结构、文档导航的要求）
+6. LLM 返回完整 `AGENTS.md` 内容。
+7. 做基础格式检查（frontmatter 存在、必要章节存在）。
+8. `--dry-run` 模式下返回生成内容；正常执行模式下写入 `AGENTS.md`。
+9. 若目标目录不是项目根，更新父级 guide 文档的导航。
 
-详见 [`rules/docs-navigation.md`](rules/docs-navigation.md)。
+### 父级查找算法
 
-## 本地覆盖规则
+生成 `src/auth/AGENTS.md` 时：
 
-详见 [`rules/override.md`](rules/override.md)。
+1. 取目标目录的父目录 `src/`。
+2. 在 `src/` 下扫描所有 `.md` 文件。
+3. 找到带 `agents-guide: true` 的文件，即父级 guide 文档。
+4. 若找到多个，报错。
+5. 若未找到，继续向上一级扫描，直到项目边界。
+6. 在项目边界处仍未找到，说明没有父级 guide，停止。
 
-## 生成后自检
+## 规则索引
 
-详见 [`rules/review-checklist.md`](rules/review-checklist.md)。
-
-## 链接规则
-
-| 关系 | 方向 | 维护方式 |
-|---|---|---|
-| guide → 子 guide / leaf | 单向 | guide 的“文档导航”链接到其下的子 guide 和 leaf 文档 |
-
-子 guide 不需要显式声明父级。skill 生成子指南时，会自动向上扫描并更新父指南的“文档导航”。
+| 名称 | 路径 |
+|---|---|
+| 目录结构生成规则 | [`tree-generation`](rules/tree-generation.md) |
+| 文档导航生成规则 | [`docs-navigation`](rules/docs-navigation.md) |
+| 本地覆盖规则 | [`override`](rules/override.md) |
 
 ## 检查清单
 
-展示结果前，必须按 `rules/review-checklist.md` 自检。
+展示结果前，按以下清单自检：
 
 - [ ] **frontmatter 检查**：必须包含 `agents-guide: true`；`name`、`description` 按规则填写
 - [ ] **章节检查**：只生成必要的章节，不强求三节；无用户明确要求时不写入技术栈、架构、编码规范、测试、依赖、注意事项等章节
 - [ ] **真实性检查**：文档导航中引用的文件真实存在
 - [ ] **父级回写检查**（非根目录）：父级 guide 的文档导航中已正确添加当前目录条目，未重复添加
-- [ ] **subagent 执行检查**：生成工作由主 subagent独立完成，当前会话未中途注入额外上下文或修改指令

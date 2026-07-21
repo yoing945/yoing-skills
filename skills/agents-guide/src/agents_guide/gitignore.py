@@ -49,3 +49,11 @@ def is_ignored(rel_path: str, spec: pathspec.PathSpec) -> bool:
         return True
     # 目录模式通常以 / 结尾，对目录路径也尝试带斜杠匹配
     return spec.match_file(rel_path + "/")
+
+
+def merge_exclude_patterns(spec: pathspec.PathSpec, raw_patterns: list[str], extra_patterns: list[str]) -> tuple[pathspec.PathSpec, list[str]]:
+    """将额外的排除模式合并到现有 PathSpec 中。"""
+    if not extra_patterns:
+        return spec, raw_patterns
+    combined = raw_patterns + extra_patterns
+    return pathspec.PathSpec.from_lines("gitignore", combined), combined
