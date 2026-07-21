@@ -1,3 +1,11 @@
+meta:
+  name: yoing-skills
+  description: 个人 AI skills 仓库
+
 tree:
+  include:
+    - .agents/
+
+docs:
   include:
     - .agents/

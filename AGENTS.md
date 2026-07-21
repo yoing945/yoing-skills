@@ -1,9 +1,3 @@
----
-agents-guide: true
-name: yoing-skills
-description: 个人 AI skills 仓库
----
-
 # yoing-skills
 
 个人 AI skills 仓库。
@@ -27,7 +21,8 @@ yoing-skills/
 
 ## 文档导航
 
-| 名称 | 类型 | 说明 |
-|---|---|---|
-| [prompts](prompts/AGENTS.md) | guide | AI 行为与编码提示词 |
-| [README](README.md) | leaf | 项目目标与主要技能 |
+| 名称 | 说明 |
+|---|---|
+| [项目级agent](.agents/AGENTS.md) | AI 助手运行时数据，包括项目级记忆与实验性 skill |
+| [prompts](prompts/AGENTS.md) | AI 行为与编码提示词 |
+| [README](README.md) | 项目目标与主要技能 |

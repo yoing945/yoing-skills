@@ -1,6 +1,8 @@
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+import yaml
+
 from agents_guide.gitignore import collect_gitignore_rules, is_ignored, merge_exclude_patterns
 
 
@@ -8,9 +10,6 @@ from agents_guide.gitignore import collect_gitignore_rules, is_ignored, merge_ex
 
 # 只扫描指定后缀的文件
 DOC_SUFFIX = ".md"
-
-# 默认排除的文件名（不纳入文档导航）
-DEFAULT_EXCLUDE_NAMES = set()
 
 # 默认额外扫描的目录（非递归），这些目录下的 .md 文件也作为 leaf 纳入
 DEFAULT_INCLUDE_DOC_DIRS = {
@@ -20,28 +19,32 @@ DEFAULT_INCLUDE_DOC_DIRS = {
 # ==================== 实现 ====================
 
 
-_FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+def _is_agents_md(path: Path) -> bool:
+    """判断是否为 agents-guide 生成的 guide 文档。"""
+    return path.is_file() and path.name.lower() == "agents.md"
 
 
-def parse_frontmatter(content: str) -> Dict[str, str]:
-    """轻量级 frontmatter 解析，仅支持简单 key: value 行。"""
-    match = _FRONTMATTER_RE.match(content)
-    if not match:
+def _load_meta(directory: Path) -> Dict[str, str]:
+    """读取目录下的 .agents-guide.yaml，返回 meta 字典（若存在）。"""
+    config_file = directory / ".agents-guide.yaml"
+    if not config_file.is_file():
         return {}
-    result: Dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        result[key.strip()] = value.strip()
-    return result
+    try:
+        with config_file.open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+    except Exception:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    meta = data.get("meta") or {}
+    if isinstance(meta, dict):
+        return {k: str(v) for k, v in meta.items() if v is not None}
+    return {}
 
 
-def _is_guide(path: Path) -> bool:
-    if not path.exists():
-        return False
-    fm = parse_frontmatter(path.read_text(encoding="utf-8"))
-    return fm.get("agents-guide") == "true"
+def _guide_name(directory: Path) -> str:
+    """获取 guide 在导航中使用的名称：优先 .agents-guide.yaml 的 meta.name，否则用目录名。"""
+    return _load_meta(directory).get("name") or directory.name
 
 
 def _scan_md_files(
@@ -105,35 +108,24 @@ def scan_docs(
             else:
                 include_names.add(normalized)
 
-    # include 可覆盖默认排除的文件名
-    default_exclude = DEFAULT_EXCLUDE_NAMES - include_names
-
     guides: List[Dict[str, Any]] = []
     leafs: List[Dict[str, Any]] = []
 
     # 当前目录
     current_files = _scan_md_files(target_dir, project_root, spec, include_names)
-    guide_files = [f for f in current_files if f.name not in default_exclude and _is_guide(f)]
-    if len(guide_files) > 1:
-        raise ValueError(
-            f"目录 {target_dir} 下发现多份 guide 文档："
-            f"{[f.name for f in guide_files]}"
-        )
+    current_guide = next((f for f in current_files if _is_agents_md(f)), None)
+    current_meta = _load_meta(target_dir)
 
     for f in current_files:
         rel = f.relative_to(target_dir).as_posix()
-        if f.name in default_exclude:
-            continue
         if f.name in exclude_names:
             continue
-        if f in guide_files:
-            fm = parse_frontmatter(f.read_text(encoding="utf-8"))
-            name = fm.get("name") or (target_dir.name if f.parent == target_dir else f.stem)
+        if f is current_guide:
             guides.append({
-                "name": name,
+                "name": current_meta.get("name") or target_dir.name,
                 "rel_path": rel,
                 "source": "current",
-                "frontmatter": fm,
+                "meta": current_meta,
             })
         else:
             leafs.append({"name": f.stem, "rel_path": rel})
@@ -149,8 +141,6 @@ def scan_docs(
         if is_ignored(rel_to_project, spec):
             continue
         for f in _scan_md_files(doc_dir, project_root, spec, include_names):
-            if f.name in default_exclude:
-                continue
             if f.name in exclude_names:
                 continue
             leafs.append({"name": f.stem, "rel_path": f.relative_to(target_dir).as_posix()})
@@ -166,19 +156,14 @@ def scan_docs(
         if is_ignored(rel_to_project, spec):
             continue
         sub_files = _scan_md_files(subdir, project_root, spec, include_names)
-        sub_guides = [f for f in sub_files if f.name not in default_exclude and _is_guide(f)]
-        if len(sub_guides) > 1:
-            raise ValueError(
-                f"目录 {subdir} 下发现多份 guide 文档："
-                f"{[f.name for f in sub_guides]}"
-            )
-        for f in sub_guides:
-            fm = parse_frontmatter(f.read_text(encoding="utf-8"))
+        sub_guide = next((f for f in sub_files if _is_agents_md(f)), None)
+        if sub_guide:
+            sub_meta = _load_meta(subdir)
             guides.append({
-                "name": fm.get("name") or subdir.name,
-                "rel_path": f.relative_to(target_dir).as_posix(),
+                "name": sub_meta.get("name") or subdir.name,
+                "rel_path": sub_guide.relative_to(target_dir).as_posix(),
                 "source": "subdirectory",
-                "frontmatter": fm,
+                "meta": sub_meta,
             })
 
     # include 显式列出的文件（含非 .md 文件）：验证存在后纳入 leaf

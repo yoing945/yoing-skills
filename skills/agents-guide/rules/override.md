@@ -4,30 +4,41 @@
 
 ## 文件格式
 
-文件采用 YAML 格式，顶层按扫描阶段分为 `tree`（目录结构）和 `docs`（文档导航）两个可选键：
+文件采用 YAML 格式，顶层分为三个可选键：
+
+- `meta`：当前目录 `AGENTS.md` 的元数据（名称与描述）。
+- `tree`：目录结构扫描阶段的 include/exclude。
+- `docs`：文档导航扫描阶段的 include/exclude。
 
 ```yaml
-# 目录结构（tree 扫描）
+# meta：控制生成的 AGENTS.md 标题、首段简介，以及父级导航中的显示
+meta:
+  name: yoing-nexus          # 可选；默认使用目录名
+  description: 一句话中文描述 # 可选；默认提取 AGENTS.md 正文第一段
+
+# tree：目录结构（## 目录结构）生成阶段的覆盖规则
 tree:
   include:
-    - .agents/
+    - .agents/     # 目录建议以 / 结尾；实际存在的目录不加也能识别
     - src/core/
   exclude:
-    - temp/
+    - temp/        # 被排除的目录不会出现在目录树中
 
-# 文档导航（docs 扫描）
+# docs：文档导航（## 文档导航）生成阶段的覆盖规则
 docs:
   include:
-    - CHANGELOG.md
-    - assets/spec.xlsx
+    - CHANGELOG.md          # 普通 md 文件
+    - assets/spec.xlsx      # 非 md 文件也可显式纳入 leaf
   exclude:
-    - DRAFT.md
+    - DRAFT.md              # 被排除的文件不纳入文档导航
 ```
 
 规则说明：
 
-- `tree` / `docs` 均可省略；文件为空时，视为空配置，不修改生成结果。
-- 每个键下使用 `include:` / `exclude:` 列表，两者均可省略。
+- `meta` / `tree` / `docs` 均可省略；文件为空时，视为空配置，按默认值生成。
+- `meta.name` 用于 `AGENTS.md` 标题和父级导航链接文本；省略时使用目录名。
+- `meta.description` 用于 `AGENTS.md` 首段简介和父级导航说明；省略时默认提取 `AGENTS.md` 正文第一段。
+- `tree` / `docs` 下使用 `include:` / `exclude:` 列表，两者均可省略。
 - 路径相对于目标目录；目录建议以 `/` 结尾（实际存在的目录不加也能识别），文件直接写文件名或相对路径。
 - `tree` 的规则传给 `agents-guide tree --include/--exclude`。
 - `docs` 的规则传给 `agents-guide docs --include/--exclude`；`docs.include` 显式列出的文件可以是任意格式（如 `.xlsx`），脚本验证文件存在后纳入 leaf。
@@ -42,6 +53,7 @@ docs:
 
 `agents-guide` 命令通过 PyYAML 直接读取 `.agents-guide.yaml`，无需 LLM 介入：
 
+- `meta` 用于控制 `AGENTS.md` 的标题、首段简介，以及父级导航中的显示；若省略则使用目录名和 `AGENTS.md` 正文第一段。
 - `tree` 对应 `## 目录结构` 生成阶段，其 `include` / `exclude` 传给 `agents-guide tree --include/--exclude`。
 - `docs` 对应 `## 文档导航` 生成阶段，其 `include` / `exclude` 传给 `agents-guide docs --include/--exclude`。
 - CLI 传入的 `--include` / `--exclude` 与 YAML 中的同类型列表合并；未提供时仅使用 YAML 配置。

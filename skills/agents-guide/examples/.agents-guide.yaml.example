@@ -1,0 +1,29 @@
+# 当前目录下 agents-guide 工具的配置文件。
+# 复制到目标目录后重命名为 .agents-guide.yaml
+
+# meta：控制生成的 AGENTS.md 标题、首段简介，以及父级导航中的显示
+meta:
+  # name 用于 AGENTS.md 标题和父级导航链接；省略则使用目录名
+  name: example-project
+  # description 用于 AGENTS.md 首段和父级导航说明；省略则提取 AGENTS.md 正文第一段
+  description: 一句话中文描述
+
+# tree：目录结构（## 目录结构）生成阶段的覆盖规则
+tree:
+  # include 中的目录即使被默认排除（如隐藏目录）也会显示在目录树中
+  include:
+    - .agents/     # 目录建议以 / 结尾；实际存在的目录不加也能识别
+    - src/core/
+  # exclude 中的目录/文件不会出现在目录树中
+  exclude:
+    - temp/        # 被排除的目录
+
+# docs：文档导航（## 文档导航）生成阶段的覆盖规则
+docs:
+  # include 显式列出的文件会纳入文档导航，即使不是 .md 文件
+  include:
+    - CHANGELOG.md          # 普通 md 文件
+    - assets/spec.xlsx      # 非 md 文件也可显式纳入 leaf
+  # exclude 列出的文件不纳入文档导航
+  exclude:
+    - DRAFT.md              # 被排除的文件
