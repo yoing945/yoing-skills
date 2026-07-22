@@ -35,7 +35,7 @@
     "leafs": [
       {"name": "README", "rel_path": "README.md"}
     ],
-    "override_exists": false
+    "config_exists": false
   }
   ```
 - `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude` 规则。

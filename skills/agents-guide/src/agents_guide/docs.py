@@ -185,5 +185,5 @@ def scan_docs(
         "target_dir": str(target_dir),
         "guides": guides,
         "leafs": leafs,
-        "override_exists": (target_dir / ".agents-guide.yaml").exists(),
+        "config_exists": (target_dir / ".agents-guide.yaml").exists(),
     }

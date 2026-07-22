@@ -8,7 +8,7 @@
 agents-guide                  # 生成项目根 AGENTS.md
 agents-guide prompts          # 生成 prompts/AGENTS.md
 agents-guide --dry-run src/payment  # 预览生成结果
-agents-guide --init-override  # 创建 override 模板
+agents-guide --init-config    # 创建配置模板
 ```
 
 ## 文档

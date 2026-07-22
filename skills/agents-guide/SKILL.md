@@ -78,7 +78,7 @@ meta:
 ### 生成流程
 
 1. 确定目标目录和项目边界。
-2. Python 扫描脚本读取目标目录下的 `.agents-guide.yaml`（如存在），按 `tree` / `docs` 键解析为两组 `include` / `exclude` 数组，并与 CLI 参数合并；同时读取 `meta` 键（详见 [`rules/override.md`](rules/override.md)）。
+2. Python 扫描脚本读取目标目录下的 `.agents-guide.yaml`（如存在），按 `tree` / `docs` 键解析为两组 `include` / `exclude` 数组，并与 CLI 参数合并；同时读取 `meta` 键（详见 [`rules/config.md`](rules/config.md)）。
 3. 调用 `agents-guide tree --target <dir> --depth <N> --exclude <目录1> --include <目录2> ...` 获取目录结构 JSON。
 4. 调用 `agents-guide docs --target <dir> --exclude <文件1> --include <文件2> ...` 获取 guide/leaf 文档 JSON。
 5. 检查目标目录是否已有 `AGENTS.md`：
@@ -113,7 +113,7 @@ meta:
 |---|---|
 | 目录结构生成规则 | [`tree-generation`](rules/tree-generation.md) |
 | 文档导航生成规则 | [`docs-navigation`](rules/docs-navigation.md) |
-| 本地覆盖规则 | [`override`](rules/override.md) |
+| 本地配置规则 | [`config`](rules/config.md) |
 
 ## 检查清单
 

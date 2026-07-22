@@ -12,7 +12,7 @@ yoing-skills/
 ├── docs/                 # 项目文档
 ├── prompts/              # AI 行为与编码提示词
 └── skills/               # 核心 skill
-    ├── agents-context/   # 项目/模块上下文统一获取
+    ├── agents-context/   # 目录上下文统一获取
     ├── agents-guide/     # 生成项目地图文档的 skill
     ├── brainstorming/    # 将想法转化为确认设计并生成设计文档
     ├── confmirror/       # ConfMirror 配置备份/还原工具 skill

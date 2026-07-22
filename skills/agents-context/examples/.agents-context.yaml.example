@@ -1,0 +1,11 @@
+# agents-context 依赖上下文配置示例
+# 文件优先级：.agents-context.local.yaml > .agents-context.yaml
+# 采用 YAML 键值映射结构，以目录标识为键
+
+darksun-skills:
+  path: "E:\\workspace\\OtherProjects\\darksun-skills"
+  description: "公司内部技能仓库"
+
+shared-utils:
+  path: "../shared-utils"
+  description: "公共工具库"

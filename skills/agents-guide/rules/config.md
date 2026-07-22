@@ -1,6 +1,6 @@
-# 本地覆盖规则（`.agents-guide.yaml`）
+# 本地配置规则（`.agents-guide.yaml`）
 
-每个目录可以包含一个 `.agents-guide.yaml` 文件，用于覆盖 `agents-guide` 生成 `AGENTS.md` 的默认规则。该文件是工具配置，**不纳入文档导航**。
+每个目录可以包含一个 `.agents-guide.yaml` 文件，用于配置 `agents-guide` 生成 `AGENTS.md` 的规则。该文件是工具配置，**不纳入文档导航**。
 
 ## 文件格式
 

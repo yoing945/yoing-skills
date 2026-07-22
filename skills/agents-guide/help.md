@@ -17,8 +17,8 @@ agents-guide [path] [options]
 agents-guide --help                          # 显示帮助信息
 agents-guide --dry-run [path]                # 预览生成结果，不写入文件
 agents-guide --depth N [path]                # 控制 ## 目录结构 的索引深度，默认 3
-agents-guide --init-override [path]          # 复制 examples/.agents-guide.yaml.example 到目标目录，并重命名为 .agents-guide.yaml
-agents-guide --init-override --dry-run [path] # 预览 override 模板，不创建文件
+agents-guide --init-config [path]            # 复制 examples/.agents-guide.yaml.example 到目标目录，并重命名为 .agents-guide.yaml
+agents-guide --init-config --dry-run [path]   # 预览配置模板，不创建文件
 ```
 
 ## 示例
