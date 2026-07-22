@@ -25,4 +25,5 @@ yoing-skills/
 |---|---|
 | [项目级agent](.agents/AGENTS.md) | AI 助手运行时数据，包括项目级记忆与实验性 skill |
 | [prompts](prompts/AGENTS.md) | AI 行为与编码提示词 |
+| [待办计划](docs/TODO.md) | 项目待办事项与后续优化计划 |
 | [README](README.md) | 项目目标与主要技能 |
