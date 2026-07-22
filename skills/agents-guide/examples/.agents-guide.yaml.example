@@ -1,6 +1,3 @@
-# 当前目录下 agents-guide 工具的配置文件。
-# 复制到目标目录后重命名为 .agents-guide.yaml
-
 # meta：控制生成的 AGENTS.md 标题、首段简介，以及父级导航中的显示
 meta:
   # name 用于 AGENTS.md 标题和父级导航链接；省略则使用目录名
