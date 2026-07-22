@@ -30,11 +30,11 @@ agents-context [target] [options]
 | 选项 | 说明 |
 |---|---|
 | `-h`, `--help` | 显示帮助信息 |
-| `--init-config` | 在当前目录创建 `.agents-context.local.yaml` 模板 |
+| `--init-config [path]` | 在指定目录创建 `.agents-context.local.yaml` 模板；省略 `path` 时使用当前工作目录 |
 
 AI 识别到 `-h` 或 `--help` 时，直接输出 `help.md` 内容并停止后续上下文获取逻辑。
 
-`--init-config` 用于在当前工作目录生成依赖上下文配置文件模板；若 `.agents-context.local.yaml` 已存在，提示用户并退出，不覆盖。
+`--init-config` 用于在指定目录生成依赖上下文配置文件模板；省略目录时使用当前工作目录。若目标目录的 `.agents-context.local.yaml` 已存在，提示用户并退出，不覆盖。
 
 ## 目标解析
 
@@ -90,6 +90,6 @@ project-alias:
 - [ ] 已正确解析目标目录
 - [ ] 已读取目标目录下的指南、文档和核心源码
 - [ ] `-h` / `--help` 能正确输出帮助信息并停止执行
-- [ ] `--init-config` 能在当前目录生成 `.agents-context.local.yaml` 模板，且不覆盖已存在文件
+- [ ] `--init-config` 能在当前目录或指定目录生成 `.agents-context.local.yaml` 模板，且不覆盖已存在文件
 - [ ] 若存在依赖，已向用户确认并仅加载指定依赖（或已跳过）
 - [ ] 向用户提供了对应目标目录的上下文摘要

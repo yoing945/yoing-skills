@@ -17,6 +17,7 @@ agents-context [target] [options]
 agents-context -h                          # 显示帮助信息
 agents-context --help                      # 显示帮助信息
 agents-context --init-config               # 在当前目录创建 .agents-context.local.yaml 模板
+agents-context --init-config skills/agents-guide  # 在指定目录创建 .agents-context.local.yaml 模板
 ```
 
 ## 示例
@@ -25,7 +26,8 @@ agents-context --init-config               # 在当前目录创建 .agents-conte
 agents-context                             # 获取当前目录上下文
 agents-context skills/agents-guide         # 按路径获取目录上下文
 agents-context agents-guide                # 按名称获取目录上下文
-agents-context --init-config               # 初始化依赖上下文配置文件
+agents-context --init-config               # 在当前目录初始化依赖上下文配置文件
+agents-context --init-config skills/agents-guide  # 在指定目录初始化依赖上下文配置文件
 ```
 
 ## 依赖上下文配置文件
