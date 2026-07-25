@@ -4,9 +4,10 @@
 
 ## 文件格式
 
-文件采用 YAML 格式，顶层分为三个可选键：
+文件采用 YAML 格式，顶层分为四个可选键：
 
 - `meta`：当前目录 `AGENTS.md` 的元数据（名称与描述）。
+- `scan`：`tree` 与 `docs` 的共同基础配置（depth/include/exclude）。
 - `tree`：目录结构扫描阶段的 depth/include/exclude。
 - `docs`：文档导航扫描阶段的 depth/include/exclude。
 
@@ -15,6 +16,14 @@
 meta:
   name: yoing-nexus          # 可选；默认使用目录名
   description: 一句话中文描述 # 可选；默认提取 AGENTS.md 正文第一段
+
+# scan：tree 与 docs 的共同基础配置
+scan:
+  depth: 3          # tree 和 docs 的共同默认深度
+  include:
+    - .agents/     # 两个 stage 都强制包含的目录/文件
+  exclude:
+    - tests/        # 两个 stage 都排除的目录/文件
 
 # tree：目录结构（## 目录结构）生成阶段的覆盖规则
 tree:
@@ -56,9 +65,13 @@ docs:
 `agents-guide` 命令通过 PyYAML 直接读取 `.agents-guide.yaml`，无需 LLM 介入：
 
 - `meta` 用于控制 `AGENTS.md` 的标题、首段简介，以及父级导航中的显示；若省略则使用目录名和 `AGENTS.md` 正文第一段。
-- `tree` 对应 `## 目录结构` 生成阶段，其 `include` / `exclude` 传给 `agents-guide tree --include/--exclude`。
-- `docs` 对应 `## 文档导航` 生成阶段，其 `include` / `exclude` 传给 `agents-guide docs --include/--exclude`。
+- `scan` 为可选键。若存在，其 `depth` / `include` / `exclude` 作为 `tree` 和 `docs` 的共同基础。
+- `tree.depth` / `docs.depth` 若存在则覆盖 `scan.depth`；否则继承 `scan.depth`。
+- `tree.include` / `docs.include` 与 `scan.include` 合并；`tree.exclude` / `docs.exclude` 与 `scan.exclude` 合并。
+- `tree` 对应 `## 目录结构` 生成阶段，其最终 `include` / `exclude` 传给 `agents-guide tree --include/--exclude`。
+- `docs` 对应 `## 文档导航` 生成阶段，其最终 `include` / `exclude` 传给 `agents-guide docs --include/--exclude`。
 - CLI 传入的 `--include` / `--exclude` 与 YAML 中的同类型列表合并；未提供时仅使用 YAML 配置。
+- 无 `scan` 时，`tree` / `docs` 行为与之前完全一致。
 - 键不存在或列表为空时，对应数组为 `[]`；文件为空或无法解析时，按空配置处理。
 
 **规则优先级**：`include` > 默认排除规则 > `exclude` > `.gitignore`。
