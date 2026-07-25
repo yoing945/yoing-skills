@@ -16,4 +16,7 @@ docs/superpowers/
 
 # 临时翻译/实验目录
 temp/
-**/tests
+
+# 忽略所有子目录下的 tests/，但保留工程根目录的 tests/
+**/tests/
+!/tests/

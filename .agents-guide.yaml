@@ -5,6 +5,8 @@ meta:
 tree:
   include:
     - .agents/
+  exclude:
+    - tests/
 
 docs:
   include:

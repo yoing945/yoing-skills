@@ -1,1 +1,2 @@
 - [技能操作优先在项目仓库](skill_workflow.md) — 用户目录技能来源于本项目，操作技能时优先在当前仓库搜索
+- [技能测试工作流](skill_testing.md) — skill 测试统一放在根目录 `tests/<skill-name>/` 下，通过根目录 `pytest.ini` 配置 `pythonpath`
