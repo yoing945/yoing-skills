@@ -5,24 +5,37 @@ meta:
   # description 用于 AGENTS.md 首段和父级导航说明；省略则提取 AGENTS.md 正文第一段
   description: 一句话中文描述
 
+# scan：tree 与 docs 的共同基础配置（可选）。
+# 其 depth / include / exclude 会作为 tree 和 docs 的默认值，
+# 可被下方的 tree / docs 同名键覆盖或合并。
+scan:
+  depth: 3          # tree 和 docs 的共同默认深度
+  # include 中的目录/文件会强制纳入 tree 和 docs 的扫描范围
+  include:
+    - .agents/      # 目录建议以 / 结尾；实际存在的目录不加也能识别
+  # exclude 中的目录/文件会从 tree 和 docs 中同时排除
+  exclude:
+    - tests/        # 两个 stage 都排除的目录
+
 # tree：目录结构（## 目录结构）生成阶段的覆盖规则
 tree:
+  # depth 存在时覆盖 scan.depth；省略则继承 scan.depth
   depth: 3          # 目录结构展开深度，默认 3
-  # include 中的目录即使被默认排除（如隐藏目录）也会显示在目录树中
+  # include 与 scan.include 合并；目录即使被默认排除也会显示在目录树中
   include:
-    - .agents/     # 目录建议以 / 结尾；实际存在的目录不加也能识别
     - src/core/
-  # exclude 中的目录/文件不会出现在目录树中
+  # exclude 与 scan.exclude 合并；这些目录/文件不会出现在目录树中
   exclude:
-    - temp/        # 被排除的目录
+    - temp/         # 被排除的目录
 
 # docs：文档导航（## 文档导航）生成阶段的覆盖规则
 docs:
+  # depth 存在时覆盖 scan.depth；省略则继承 scan.depth
   depth: 3          # 文档扫描深度，默认 3
-  # include 显式列出的文件会纳入文档导航，即使不是 .md 文件
+  # include 与 scan.include 合并；显式列出的文件会纳入文档导航，即使不是 .md 文件
   include:
     - CHANGELOG.md          # 普通 md 文件
     - assets/spec.xlsx      # 非 md 文件也可显式纳入 leaf
-  # exclude 列出的文件不纳入文档导航
+  # exclude 与 scan.exclude 合并；列出的文件不纳入文档导航
   exclude:
-    - DRAFT.md              # 被排除的文件
+    - DRAFT.md              # 被排除的文件不纳入文档导航
