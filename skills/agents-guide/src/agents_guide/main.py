@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-from agents_guide.common import find_project_root, resolve_depth
+from agents_guide.common import find_project_root, resolve_depth, _resolve_section_config
 from agents_guide.docs import scan_docs
 from agents_guide.tree import scan_tree
 
@@ -80,24 +80,27 @@ def main(argv: Any = None) -> int:
 
     project_root = find_project_root(target)
     config = _load_config(target)
+    scan_config = config.get("scan", {})
 
     if args.command == "tree":
+        section = _resolve_section_config(scan_config, config.get("tree", {}), 3)
         tree_depth = resolve_depth(
             cli_specific=args.tree_depth,
             cli_common=args.depth,
-            yaml_value=config.get("tree", {}).get("depth"),
+            yaml_value=section["depth"],
             default=3,
         )
-        include, exclude = _merge_section_args(args.include, args.exclude, config.get("tree", {}))
+        include, exclude = _merge_section_args(args.include, args.exclude, section)
         data = scan_tree(target, tree_depth, project_root, exclude=exclude, include=include)
     elif args.command == "docs":
+        section = _resolve_section_config(scan_config, config.get("docs", {}), 3)
         docs_depth = resolve_depth(
             cli_specific=args.docs_depth,
             cli_common=args.depth,
-            yaml_value=config.get("docs", {}).get("depth"),
+            yaml_value=section["depth"],
             default=3,
         )
-        include, exclude = _merge_section_args(args.include, args.exclude, config.get("docs", {}))
+        include, exclude = _merge_section_args(args.include, args.exclude, section)
         data = scan_docs(target, docs_depth, project_root, exclude=exclude, include=include)
     else:
         parser.print_help()
