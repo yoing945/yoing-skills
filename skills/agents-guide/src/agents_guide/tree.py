@@ -55,7 +55,12 @@ def scan_tree(
             if is_ignored(rel_to_project, spec):
                 continue
             rel_to_target = entry.relative_to(target_dir).as_posix()
-            children = walk(entry, current_depth + 1) if current_depth < depth else []
+
+            # 模块边界：目录包含 AGENTS.md 时作为叶子节点，不展开子目录
+            children: List[Dict[str, Any]] = []
+            if current_depth < depth and not (entry / "AGENTS.md").exists():
+                children = walk(entry, current_depth + 1)
+
             nodes.append({
                 "name": entry.name,
                 "rel_path": rel_to_target,

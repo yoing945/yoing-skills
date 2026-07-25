@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-from agents_guide.common import find_project_root
+from agents_guide.common import find_project_root, resolve_depth
 from agents_guide.docs import scan_docs
 from agents_guide.tree import scan_tree
 
@@ -55,12 +55,15 @@ def main(argv: Any = None) -> int:
 
     tree_parser = subparsers.add_parser("tree", help="扫描目录结构")
     tree_parser.add_argument("--target", required=True, type=Path)
-    tree_parser.add_argument("--depth", type=int, default=3)
+    tree_parser.add_argument("--depth", type=int, default=None, help="通用深度参数（覆盖 tree 深度）")
+    tree_parser.add_argument("--tree-depth", type=int, default=None, help="单独覆盖 tree 深度")
     tree_parser.add_argument("--exclude", action="append", default=[], help="排除目录/文件，可多次指定")
     tree_parser.add_argument("--include", action="append", default=[], help="强制包含目录/文件，可多次指定")
 
     docs_parser = subparsers.add_parser("docs", help="发现 guide/leaf 文档")
     docs_parser.add_argument("--target", required=True, type=Path)
+    docs_parser.add_argument("--depth", type=int, default=None, help="通用深度参数（覆盖 docs 深度）")
+    docs_parser.add_argument("--docs-depth", type=int, default=None, help="单独覆盖 docs 深度")
     docs_parser.add_argument("--exclude", action="append", default=[], help="排除目录/文件，可多次指定")
     docs_parser.add_argument("--include", action="append", default=[], help="强制包含目录/文件，可多次指定")
 
@@ -79,11 +82,23 @@ def main(argv: Any = None) -> int:
     config = _load_config(target)
 
     if args.command == "tree":
+        tree_depth = resolve_depth(
+            cli_specific=args.tree_depth,
+            cli_common=args.depth,
+            yaml_value=config.get("tree", {}).get("depth"),
+            default=3,
+        )
         include, exclude = _merge_section_args(args.include, args.exclude, config.get("tree", {}))
-        data = scan_tree(target, args.depth, project_root, exclude=exclude, include=include)
+        data = scan_tree(target, tree_depth, project_root, exclude=exclude, include=include)
     elif args.command == "docs":
+        docs_depth = resolve_depth(
+            cli_specific=args.docs_depth,
+            cli_common=args.depth,
+            yaml_value=config.get("docs", {}).get("depth"),
+            default=3,
+        )
         include, exclude = _merge_section_args(args.include, args.exclude, config.get("docs", {}))
-        data = scan_docs(target, project_root, exclude=exclude, include=include)
+        data = scan_docs(target, docs_depth, project_root, exclude=exclude, include=include)
     else:
         parser.print_help()
         return 1
