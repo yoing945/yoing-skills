@@ -29,7 +29,6 @@ agents-guide --init-config --dry-run [path]   # 预览配置模板，不创建�
 agents-guide              # 生成 AGENTS.md
 agents-guide prompts      # 生成 prompts/AGENTS.md
 agents-guide --dry-run src/payment  # 预览 src/payment/AGENTS.md
-agents-guide tree --target . --tree-depth 2  # 指定 tree 扫描深度
-agents-guide docs --target . --docs-depth 2  # 指定 docs 扫描深度
+agents-guide --depth 2 src/payment  # 同时指定 tree 与 docs 的扫描深度
 ```
 
