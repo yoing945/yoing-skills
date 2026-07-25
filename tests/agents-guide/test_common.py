@@ -2,7 +2,51 @@ import warnings
 
 import pytest
 
-from agents_guide.common import resolve_depth
+from agents_guide.common import _resolve_section_config, resolve_depth
+
+
+def test_resolve_section_config_uses_stage_depth_over_scan():
+    result = _resolve_section_config(
+        {"depth": 2, "include": ["a"], "exclude": ["b"]},
+        {"depth": 5, "include": ["c"], "exclude": ["d"]},
+        default_depth=3,
+    )
+    assert result["depth"] == 5
+    assert result["include"] == ["a", "c"]
+    assert result["exclude"] == ["b", "d"]
+
+
+def test_resolve_section_config_inherits_scan_depth_when_stage_missing():
+    result = _resolve_section_config(
+        {"depth": 2},
+        {},
+        default_depth=3,
+    )
+    assert result["depth"] == 2
+    assert result["include"] is None
+    assert result["exclude"] is None
+
+
+def test_resolve_section_config_uses_default_when_both_missing_depth():
+    result = _resolve_section_config({}, {}, default_depth=3)
+    assert result["depth"] == 3
+
+
+def test_resolve_section_config_handles_none_sections():
+    result = _resolve_section_config(None, None, default_depth=3)
+    assert result["depth"] == 3
+    assert result["include"] is None
+    assert result["exclude"] is None
+
+
+def test_resolve_section_config_skips_none_items():
+    result = _resolve_section_config(
+        {"include": ["a", None, "b"], "exclude": [None]},
+        {"include": ["c"]},
+        default_depth=3,
+    )
+    assert result["include"] == ["a", "b", "c"]
+    assert result["exclude"] is None
 
 
 def test_resolve_depth_returns_cli_specific_first():

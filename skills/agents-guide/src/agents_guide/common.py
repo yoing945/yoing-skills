@@ -1,6 +1,6 @@
 import warnings
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 
 def resolve_depth(
@@ -40,6 +40,38 @@ def resolve_depth(
         return 1
 
     return value
+
+
+def _resolve_section_config(
+    scan_section: Any,
+    stage_section: Any,
+    default_depth: int,
+) -> Dict[str, Any]:
+    """将 scan 通用配置与 stage 特定配置合并。
+
+    - depth: stage 存在则覆盖 scan，否则使用 scan，再否则使用 default_depth。
+    - include / exclude: scan 与 stage 的列表合并。
+    """
+    scan_dict = scan_section if isinstance(scan_section, dict) else {}
+    stage_dict = stage_section if isinstance(stage_section, dict) else {}
+
+    scan_depth = scan_dict.get("depth")
+    stage_depth = stage_dict.get("depth")
+    depth = stage_depth if stage_depth is not None else (scan_depth if scan_depth is not None else default_depth)
+
+    def collect(key: str) -> Optional[List[str]]:
+        values: List[str] = []
+        for section in (scan_dict, stage_dict):
+            for item in section.get(key) or []:
+                if item is not None:
+                    values.append(str(item))
+        return values or None
+
+    return {
+        "depth": depth,
+        "include": collect("include"),
+        "exclude": collect("exclude"),
+    }
 
 
 def find_project_root(target_dir: Path) -> Path:
