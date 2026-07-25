@@ -7,8 +7,8 @@
 文件采用 YAML 格式，顶层分为三个可选键：
 
 - `meta`：当前目录 `AGENTS.md` 的元数据（名称与描述）。
-- `tree`：目录结构扫描阶段的 include/exclude。
-- `docs`：文档导航扫描阶段的 include/exclude。
+- `tree`：目录结构扫描阶段的 depth/include/exclude。
+- `docs`：文档导航扫描阶段的 depth/include/exclude。
 
 ```yaml
 # meta：控制生成的 AGENTS.md 标题、首段简介，以及父级导航中的显示
@@ -18,6 +18,7 @@ meta:
 
 # tree：目录结构（## 目录结构）生成阶段的覆盖规则
 tree:
+  depth: 3          # 目录结构展开深度，默认 3
   include:
     - .agents/     # 目录建议以 / 结尾；实际存在的目录不加也能识别
     - src/core/
@@ -26,6 +27,7 @@ tree:
 
 # docs：文档导航（## 文档导航）生成阶段的覆盖规则
 docs:
+  depth: 3          # 文档扫描深度，默认 3
   include:
     - CHANGELOG.md          # 普通 md 文件
     - assets/spec.xlsx      # 非 md 文件也可显式纳入 leaf

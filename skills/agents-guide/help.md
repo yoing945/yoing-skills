@@ -16,7 +16,9 @@ agents-guide [path] [options]
 ```text
 agents-guide --help                          # 显示帮助信息
 agents-guide --dry-run [path]                # 预览生成结果，不写入文件
-agents-guide --depth N [path]                # 控制 ## 目录结构 的索引深度，默认 3
+agents-guide --depth N [path]                # 通用深度参数（同时影响 tree 与 docs）
+agents-guide --tree-depth N [path]           # 单独覆盖 tree 深度，默认 3
+agents-guide --docs-depth N [path]           # 单独覆盖 docs 深度，默认 3
 agents-guide --init-config [path]            # 复制 examples/.agents-guide.example.yaml 到目标目录，并重命名为 .agents-guide.yaml
 agents-guide --init-config --dry-run [path]   # 预览配置模板，不创建文件
 ```
@@ -27,5 +29,7 @@ agents-guide --init-config --dry-run [path]   # 预览配置模板，不创建�
 agents-guide              # 生成 AGENTS.md
 agents-guide prompts      # 生成 prompts/AGENTS.md
 agents-guide --dry-run src/payment  # 预览 src/payment/AGENTS.md
+agents-guide tree --target . --tree-depth 2  # 指定 tree 扫描深度
+agents-guide docs --target . --docs-depth 2  # 指定 docs 扫描深度
 ```
 

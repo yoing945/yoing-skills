@@ -14,11 +14,15 @@
 
 ## 纳入规则
 
-- **guide**：当前目录下及直接子目录下真实存在的 `AGENTS.md`。
-- **leaf**：当前目录下真实存在的普通 `.md` 文件。
+- **guide**：当前目录下及子目录下真实存在的 `AGENTS.md`，但当前目录自身的 `AGENTS.md` 除外。
+- **leaf**：当前目录及子目录下真实存在的普通 `.md` 文件；子模块边界目录内的其他 `.md` 不纳入。
 - 排除当前正在生成的 guide 文档本身。
 - 排除 `.agents-guide.yaml`。
 - 结合 `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude`。
+
+## 模块边界
+
+子目录若包含 `AGENTS.md`，视为子模块 guide，收录后不再向该目录内部继续扫描。
 
 ## 输入
 
@@ -29,6 +33,7 @@
   {
     "project_root": "...",
     "target_dir": "...",
+    "current_meta": {"name": "...", "description": "..."},
     "guides": [
       {"name": "Skills", "rel_path": "skills/AGENTS.md", "source": "subdirectory", "meta": {}}
     ],
@@ -38,7 +43,12 @@
     "config_exists": false
   }
   ```
-- `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude` 规则。
+- `--depth` / `--docs-depth` 参数值。
+- `.agents-guide.yaml` 中 `docs` 章节的 `depth` / `include` / `exclude` 规则。
+
+### 深度覆盖优先级
+
+`--docs-depth` > `--depth` > `docs.depth`（YAML）> 默认值 3。
 
 ## 输出格式
 

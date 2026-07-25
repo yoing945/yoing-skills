@@ -7,6 +7,7 @@ meta:
 
 # tree：目录结构（## 目录结构）生成阶段的覆盖规则
 tree:
+  depth: 3          # 目录结构展开深度，默认 3
   # include 中的目录即使被默认排除（如隐藏目录）也会显示在目录树中
   include:
     - .agents/     # 目录建议以 / 结尾；实际存在的目录不加也能识别
@@ -17,6 +18,7 @@ tree:
 
 # docs：文档导航（## 文档导航）生成阶段的覆盖规则
 docs:
+  depth: 3          # 文档扫描深度，默认 3
   # include 显式列出的文件会纳入文档导航，即使不是 .md 文件
   include:
     - CHANGELOG.md          # 普通 md 文件
