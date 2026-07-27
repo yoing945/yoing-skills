@@ -88,8 +88,8 @@ config:
 1. 确认 `config.local.yaml` 配置正确
 2. 按「初始化」步骤创建虚拟环境并安装依赖（首次或依赖变更时）
 3. 执行同步：
-   - 使用 uv：`uv run python scripts/main.py sync`
-   - 使用 pip（需先激活虚拟环境）：`python scripts/main.py sync`
+   - 使用 uv：`uv run python scripts/main.py`
+   - 使用 pip（需先激活虚拟环境）：`python scripts/main.py`
 4. 脚本会自动完成以下操作：
    - 读取 `config.local.yaml`
    - 按项目根目录 `.gitignore` 排除被忽略的文件
@@ -101,13 +101,13 @@ config:
 
 ## 子命令
 
-### sync
+### sync（默认行为）
 
-执行同步：
+直接调用 `sync-skill` 即可执行同步：
 
 ```bash
-sync-skill sync
-sync-skill sync --dry-run
+sync-skill
+sync-skill --dry-run
 ```
 
 ### --help / -h
@@ -121,11 +121,15 @@ sync-skill -h
 
 ### commit-push
 
-对**目标工程**执行 `git add/commit/pull --rebase/push`。提交信息由 LLM 在检查目标工程变更后生成，通过 `--message` 传入。
+对**目标工程**执行 `git add/commit/pull --rebase/push`。`commit-push` 默认以同步为前提：
+
+- **未提供 `--message`**：LLM 先执行同步，再检查目标工程变更，自动生成提交信息后执行 `commit-push --message`。
+- **已提供 `--message`**：跳过 LLM 总结步骤，直接使用用户指定的提交信息。
 
 ```bash
-sync-skill commit-push --message "sync agents-guide"
-sync-skill commit-push --message "sync agents-guide" --tag       # 自动递增 patch tag
+sync-skill commit-push                                          # 先同步，再由 LLM 生成 message
+sync-skill commit-push --message "sync agents-guide"            # 使用指定 message
+sync-skill commit-push --message "sync agents-guide" --tag      # 自动递增 patch tag
 sync-skill commit-push --message "sync agents-guide" --tag v1.2.3
 sync-skill commit-push --message "sync agents-guide" --dry-run
 ```
@@ -134,15 +138,18 @@ sync-skill commit-push --message "sync agents-guide" --dry-run
 
 | 选项 | 说明 |
 |---|---|
-| `--message TEXT`, `-m TEXT` | 提交信息（必填） |
+| `--message TEXT`, `-m TEXT` | 提交信息。未提供时由 LLM 在同步后根据变更生成 |
 | `--tag [TAG]` | 无值时自动递增目标仓库 patch tag；有值时使用指定 tag |
 | `--dry-run` | 预览将要执行的 git 操作，不真正修改仓库 |
 
 ## 典型工作流
 
 ```bash
-sync-skill sync
-# LLM 检查目标工程变更并生成 --message
+# 方式一：一条命令，LLM 自动同步并生成提交信息
+sync-skill commit-push
+
+# 方式二：手动分步
+sync-skill
 sync-skill commit-push --message "sync agents-guide"
 ```
 

@@ -97,10 +97,9 @@ def main(argv=None) -> int:
     skill_root = get_skill_root()
 
     parser = argparse.ArgumentParser(prog="sync-skill")
-    subparsers = parser.add_subparsers(dest="command")
+    parser.add_argument("--dry-run", action="store_true", help="dry run for sync")
 
-    sync_parser = subparsers.add_parser("sync", help="sync skills and prompts to target project")
-    sync_parser.add_argument("--dry-run", action="store_true", help="dry run")
+    subparsers = parser.add_subparsers(dest="command")
 
     cp_parser = subparsers.add_parser("commit-push", help="commit and push target project")
     cp_parser.add_argument("--message", "-m", required=True, help="commit message")
@@ -117,20 +116,17 @@ def main(argv=None) -> int:
 
     project_root, target_path, skills, prompts = _load_project_and_target(skill_root)
 
-    if args.command == "sync":
-        if args.dry_run:
-            print("dry-run: would sync skills and prompts")
-            return 0
-        return 0 if _do_sync(project_root, target_path, skills, prompts) else 1
-
     if args.command == "commit-push":
         if args.dry_run:
             print("dry-run: would commit and push target project")
             return 0
         return _do_commit_push(target_path, args.message, args.tag)
 
-    parser.print_help()
-    return 0
+    # 默认行为：执行同步
+    if args.dry_run:
+        print("dry-run: would sync skills and prompts")
+        return 0
+    return 0 if _do_sync(project_root, target_path, skills, prompts) else 1
 
 
 if __name__ == "__main__":
