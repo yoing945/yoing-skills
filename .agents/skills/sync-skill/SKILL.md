@@ -111,7 +111,7 @@ uv run python scripts/main.py
 
 ### --help / -h
 
-输出 `help.md` 帮助文档：
+由 LLM 直接读取并输出 `help.md` 内容，不通过脚本执行，避免终端编码导致乱码。
 
 ```bash
 sync-skill --help

@@ -25,11 +25,6 @@ def _load_config(config_path: Path):
         return yaml.safe_load(f).get("config", {})
 
 
-def _print_help(skill_root: Path) -> None:
-    help_path = skill_root / "help.md"
-    print(help_path.read_text(encoding="utf-8"))
-
-
 def _do_sync(project_root: Path, target_path: Path, skills, prompts) -> bool:
     spec = load_gitignore(project_root)
 
@@ -94,8 +89,7 @@ def main(argv=None) -> int:
 
     skill_root = get_skill_root()
 
-    parser = argparse.ArgumentParser(prog="sync-skill", add_help=False)
-    parser.add_argument("--help", "-h", action="store_true", help="show help")
+    parser = argparse.ArgumentParser(prog="sync-skill")
     subparsers = parser.add_subparsers(dest="command")
 
     cp_parser = subparsers.add_parser("commit-push", help="sync, commit and push")
@@ -116,10 +110,6 @@ def main(argv=None) -> int:
     )
 
     args = parser.parse_args(argv)
-
-    if args.help:
-        _print_help(skill_root)
-        return 0
 
     config_path = skill_root / "config.local.yaml"
     if not config_path.is_file():
