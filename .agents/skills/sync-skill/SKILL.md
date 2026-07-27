@@ -97,6 +97,48 @@ config:
    - 覆盖目标 prompt 文件
    - 验证目标与源完全一致
 
+## 子命令
+
+### sync（默认）
+
+不带参数时执行同步：
+
+```bash
+sync-skill
+# 或
+uv run python scripts/main.py
+```
+
+### --help / -h
+
+输出 `help.md` 帮助文档：
+
+```bash
+sync-skill --help
+sync-skill -h
+```
+
+### commit-push
+
+先执行同步，再对源仓库和目标仓库分别执行 `git add/commit/pull --rebase/push`，两者使用相同提交信息。
+
+```bash
+sync-skill commit-push
+sync-skill commit-push --message "sync agents-guide"
+sync-skill commit-push --tag       # 自动递增 patch tag
+sync-skill commit-push --tag v1.2.3
+sync-skill commit-push --dry-run
+```
+
+`commit-push` 选项：
+
+| 选项 | 说明 |
+|---|---|
+| `--message TEXT`, `-m TEXT` | 覆盖自动生成的提交信息 |
+| `--tag [TAG]` | 无值时自动递增目标仓库 patch tag；有值时使用指定 tag |
+| `--dry-run` | 预览将要执行的 git 操作，不真正修改仓库 |
+| `--yes`, `--non-interactive` | 跳过交互确认 |
+
 ## 验证
 
 脚本执行完毕后会输出验证结果：

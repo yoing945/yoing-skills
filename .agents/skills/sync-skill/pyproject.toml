@@ -6,6 +6,7 @@ requires-python = ">=3.9"
 dependencies = [
     "pyyaml",
     "pathspec",
+    "GitPython>=3.1.0",
 ]
 
 [project.scripts]

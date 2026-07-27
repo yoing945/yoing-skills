@@ -10,9 +10,14 @@ type: project
 
 ## 目录结构
 
-测试脚本统一放在项目根目录 `tests/` 下，按 skill 名称分子目录，避免污染 `skills/` 目录（`skills/` 是同步给用户的 skill 源目录）。
+**优先规则**：如果被测试的 skill 目录本身已有 `tests/` 目录，或允许在 skill 目录内创建测试，则优先在 skill 目录本身的 `tests/` 中存放测试脚本。否则，放到项目根目录 `tests/<skill-name>/` 下。
 
 ```text
+# 优先：skill 目录内测试
+skills/<skill-name>/tests/
+└── test_xxx.py
+
+# 备选：项目根目录测试
 tests/
 └── <skill-name>/
     ├── __init__.py
@@ -20,7 +25,18 @@ tests/
     └── ...
 ```
 
-示例：
+示例（skill 目录内）：
+
+```text
+.agents/skills/sync-skill/
+├── scripts/
+└── tests/
+    ├── conftest.py
+    ├── test_sync.py
+    └── test_main.py
+```
+
+示例（项目根目录）：
 
 ```text
 tests/
@@ -70,29 +86,37 @@ pythonpath =
 ## 运行测试
 
 ```bash
-# 运行单个 skill 的测试（使用该 skill 的 .venv）
-skills/agents-guide/.venv/Scripts/python -m pytest tests/agents-guide -v
+# 测试放在 skill 目录内时，在 skill 目录下运行
+skills/<skill-name>/.venv/Scripts/python -m pytest tests/ -v
 
-# 运行单个测试文件
-skills/agents-guide/.venv/Scripts/python -m pytest tests/agents-guide/test_tree.py -v
+# 测试放在项目根目录时，使用该 skill 的 .venv 并指定测试路径
+skills/<skill-name>/.venv/Scripts/python -m pytest tests/<skill-name> -v
 ```
 
 > 不推荐在根目录创建统一虚拟环境运行所有 skill 测试。若确实需要一次性全量运行，可使用 `tox` / `nox` 等工具为每个 skill 创建隔离环境并逐个执行，避免依赖冲突。
 
 ## 为新 skill 添加测试
 
-1. 在 `skills/<skill-name>/` 下创建 skill 专用 `.venv` 并安装依赖与 pytest：
+1. 在 skill 目录下创建 skill 专用 `.venv` 并安装依赖与 pytest：
    ```bash
-   cd skills/<skill-name>
+   cd skills/<skill-name>          # 或 .agents/skills/<skill-name>
    python -m venv .venv
    .venv/Scripts/python -m pip install -e .
    .venv/Scripts/python -m pip install pytest
    ```
-2. 在 `tests/<skill-name>/` 下创建 `__init__.py` 和测试文件。
-3. 在根目录 `pytest.ini` 的 `pythonpath` 中追加该 skill 的 `src` 目录。
-4. 运行 `skills/<skill-name>/.venv/Scripts/python -m pytest tests/<skill-name> -v` 验证。
+2. **优先**在 skill 目录内创建 `tests/` 目录，并添加测试文件；若不适合，再在项目根目录 `tests/<skill-name>/` 下创建。
+3. 若测试放在项目根目录，需要在根目录 `pytest.ini` 的 `pythonpath` 中追加该 skill 的源码根目录。
+4. 运行对应 skill 的 `.venv` 执行测试：
+   ```bash
+   # skill 目录内测试
+   skills/<skill-name>/.venv/Scripts/python -m pytest tests/ -v
 
-## 为什么测试不放 skill 包内
+   # 项目根目录测试
+   skills/<skill-name>/.venv/Scripts/python -m pytest tests/<skill-name> -v
+   ```
 
-- `skills/` 目录是同步给目标工程的 skill 源目录，测试代码不应随 skill 一起分发。
-- 项目根目录 `.gitignore` 已包含 `**/tests`，因此根目录 `tests/` 不会被 git 跟踪；但测试代码作为开发资产保留在项目仓库内，便于多机器协作开发。
+## 测试位置权衡
+
+- `skills/` 目录下的核心 skill 是同步给目标工程的源目录，测试代码若放在其中会随 skill 一起分发。因此核心 skill 优先使用项目根目录 `tests/<skill-name>/`。
+- `.agents/skills/` 下的实验性 skill 以及不对外分发的 skill，测试可以放在 skill 目录本身的 `tests/` 内，便于与 skill 代码一起维护。
+- 项目根目录 `.gitignore` 已包含 `**/tests`，因此 skill 目录内的 `tests/` 也不会被 git 跟踪；测试代码作为开发资产保留在项目仓库内，便于多机器协作开发。
