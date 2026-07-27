@@ -100,28 +100,34 @@ def verify(project_root: Path, target_path: Path, skills: List[str], prompts: Li
             continue
 
         for root, dirs, files in os.walk(src):
-            rel_root = Path(root).relative_to(src).as_posix()
+            rel_root_to_src = Path(root).relative_to(src).as_posix()
 
             dirs[:] = [
                 d
                 for d in dirs
                 if not spec.match_file(
-                    (rel_root + "/" + d if rel_root != "." else d) + "/"
+                    rel_path
+                    + "/"
+                    + (rel_root_to_src + "/" + d if rel_root_to_src != "." else d)
+                    + "/"
                 )
             ]
 
             for f in files:
-                rel_file = rel_root + "/" + f if rel_root != "." else f
-                if spec.match_file(rel_file):
+                rel_file_to_src = (
+                    rel_root_to_src + "/" + f if rel_root_to_src != "." else f
+                )
+                rel_file_to_project = rel_path + "/" + rel_file_to_src
+                if spec.match_file(rel_file_to_project):
                     continue
 
                 src_file = Path(root) / f
-                dst_file = dst / rel_file
+                dst_file = dst / rel_file_to_src
 
                 if not dst_file.is_file():
-                    errors.append(f"skill file missing in target: {skill}/{rel_file}")
+                    errors.append(f"skill file missing in target: {skill}/{rel_file_to_src}")
                 elif not filecmp.cmp(src_file, dst_file, shallow=False):
-                    errors.append(f"skill file mismatch: {skill}/{rel_file}")
+                    errors.append(f"skill file mismatch: {skill}/{rel_file_to_src}")
 
     for prompt in prompts:
         src = project_root / "prompts" / f"{prompt}.md"
