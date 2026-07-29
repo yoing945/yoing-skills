@@ -12,11 +12,13 @@ yoing-skills/
 ├── docs/                 # 项目文档
 ├── prompts/              # AI 行为与编码提示词
 └── skills/               # 核心 skill
-    ├── agents-context/   # 目录上下文统一获取
-    ├── agents-guide/     # 生成项目地图文档的 skill
-    ├── brainstorming/    # 将想法转化为确认设计并生成设计文档
-    ├── confmirror/       # ConfMirror 配置备份/还原工具 skill
-    └── ssh-context/      # 读取 ssh 配置并建立远程主机连接上下文
+    ├── agents-context/     # 目录上下文统一获取
+    ├── agents-guide/       # 生成项目地图文档的 skill
+    ├── my-brainstorming/   # 将想法转化为确认设计并生成设计文档
+    ├── my-writing-plans/   # 根据规格创建可执行的实现计划
+    ├── my-executing-plans/ # 在当前会话中执行实现计划
+    ├── confmirror/         # ConfMirror 配置备份/还原工具 skill
+    └── ssh-context/        # 读取 ssh 配置并建立远程主机连接上下文
 ```
 
 ## 文档导航
