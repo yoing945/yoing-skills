@@ -13,6 +13,7 @@ yoing-skills/
 ├── prompts/              # AI 行为与编码提示词
 └── skills/               # 核心 skill
     ├── agents-context/     # 目录上下文统一获取
+    ├── agents-commands/    # 读取并执行预定义命令集合
     ├── agents-guide/       # 生成项目地图文档的 skill
     ├── my-brainstorming/   # 将想法转化为确认设计并生成设计文档
     ├── my-writing-plans/   # 根据规格创建可执行的实现计划
@@ -27,5 +28,6 @@ yoing-skills/
 |---|---|
 | [项目级agent](.agents/AGENTS.md) | AI 助手运行时数据，包括项目级记忆与实验性 skill |
 | [prompts](prompts/AGENTS.md) | AI 行为与编码提示词 |
+| [agents-commands](skills/agents-commands/SKILL.md) | 读取并执行当前目录预定义的 LLM 命令集合 |
 | [待办计划](docs/TODO.md) | 项目待办事项与后续优化计划 |
 | [README](README.md) | 项目目标与主要技能 |

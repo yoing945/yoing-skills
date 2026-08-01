@@ -1,0 +1,18 @@
+commands:
+  - name: review
+    description: 审查当前代码
+    default: false
+    command: |
+      请审查当前目录下的代码，关注潜在 bug、命名规范和可维护性。
+
+  - name: test
+    description: 生成测试计划
+    default: true
+    command: |
+      请为当前项目生成一份测试计划，列出应覆盖的核心场景。
+
+  - name: doc
+    description: 补充文档
+    default: false
+    command: |
+      请检查当前项目中缺少文档的关键模块，并补充简洁的说明。
