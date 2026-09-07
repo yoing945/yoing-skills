@@ -1,6 +1,6 @@
 ---
 name: agents-guide
-description: 为指定目录生成渐进式项目地图文档。不带路径时生成项目根 AGENTS.md；带路径时生成该目录下的模块指南，并自动更新父级文档导航。sync 子命令递归刷新范围内所有 AGENTS.md 的文档导航，修复索引层级混乱。
+description: 为指定目录生成渐进式项目地图文档。不带路径时生成项目根 AGENTS.md；带路径时生成该目录下的模块指南，并自动更新父级文档导航。check-nav 子命令核验并修复文档导航的层级引用关系。
 ---
 
 # 渐进式项目地图生成
@@ -11,12 +11,12 @@ description: 为指定目录生成渐进式项目地图文档。不带路径时�
 
 ```text
 agents-guide [path] [options]
-agents-guide sync [path] [--dry-run]
+agents-guide check-nav [path] [--fix]
 ```
 
 - 不带 `path`：在项目边界根目录生成/更新 `AGENTS.md`
 - 带 `path`：在指定目录生成/更新模块指南，并向上回写父级文档导航
-- `sync`：递归刷新范围内所有 `AGENTS.md` 的文档导航章节，修复索引层级（详见「索引同步」）
+- `check-nav`：核验范围内所有 `AGENTS.md` 的文档导航层级引用，默认只报告差异，`--fix` 时修补（详见「索引核验」）
 
 ## 选项
 
@@ -24,6 +24,7 @@ agents-guide sync [path] [--dry-run]
 |---|---|
 | `-h`, `--help` | 基于本 SKILL.md 输出用法摘要 |
 | `--dry-run [path]` | 预览生成结果，不写入文件 |
+| `--fix` | 仅 `check-nav` 子命令：核验并写入修补（不带时只输出差异报告） |
 | `--depth N [path]` | 通用深度参数（同时影响 tree 与 docs） |
 | `--tree-depth N [path]` | 单独覆盖 tree 深度，默认 3 |
 | `--docs-depth N [path]` | 单独覆盖 docs 深度，默认 3 |
@@ -46,8 +47,8 @@ agents-guide:
 ```text
 agents-guide              # 生成 AGENTS.md
 agents-guide prompts      # 生成 prompts/AGENTS.md
-agents-guide sync         # 递归刷新整个项目的文档导航
-agents-guide sync src     # 只刷新 src/ 范围内的文档导航
+agents-guide check-nav        # 核验整个项目的文档导航，输出差异报告
+agents-guide check-nav src --fix  # 核验 src/ 范围并修补不一致条目
 agents-guide --dry-run src/payment  # 预览 src/payment/AGENTS.md
 agents-guide --depth 2 src/payment  # 同时指定 tree 与 docs 的扫描深度
 ```
@@ -119,25 +120,13 @@ guide 文档的位置决定其内容范围：
 
 回写条目时，子目录 guide 的显示名称读取其子目录 `AGENTS.md` 的标题（H1）；读取失败时使用目录名。说明文字读取该子目录 `AGENTS.md` 正文第一段，若内容较多则自行精简为简短说明。
 
-## 索引同步（sync）
+## 索引核验（check-nav）
 
-`sync` 子命令递归刷新范围内所有 `AGENTS.md` 的**文档导航**章节，修复文档变更导致的索引层级混乱。典型场景：子目录文档原本被根目录索引，后来中间新增了上层模块的 `AGENTS.md`，旧的越级条目残留，同一文档被多级重复索引。
+`check-nav` 子命令核验范围内所有 `AGENTS.md` 的**文档导航**章节与模块层级是否一致，修复越级、失效、重复等索引问题。典型场景：子目录文档原本被根目录索引，后来中间新增了上层模块的 `AGENTS.md`，旧的越级条目残留，同一文档被多级重复索引。
 
-### 执行流程
+它是对现有索引的核验与修补：沿导航链接逐层递进核验，只修补不一致的条目，保留现有名称与说明文字，不重新生成内容，不分析文档内容。默认只输出差异报告，`--fix` 时写入修补。核验范围完全由文档引用决定，不做引用之外的探测；从未被引用的文档不在范围内。
 
-1. 确定起始目录：无 `path` 时为项目边界根目录。
-2. 用 Glob 查找范围内所有 `AGENTS.md`，按目录深度**自底向上**排序（叶子优先，保证父级读取子文档标题时子文档已刷新）。
-3. 对每个目录：
-   - 调用 `python <skill目录>/run.py docs --target <dir>` 获取最新 guide/leaf 文档列表。
-   - 按 [`docs-navigation`](rules/docs-navigation.md) 规则重新生成 `## 文档导航` 章节——只索引到下一个模块边界，越级、失效条目随之消失，新增文档补入。
-   - **只替换该章节**，文档其余内容（含目录结构、自定义章节）一律不动。
-4. 逐文档输出变更摘要：新增、移除、层级调整的条目。
-
-### 约束
-
-- `sync` 只处理已存在 `AGENTS.md` 的目录，不为缺失的目录生成新文档。
-- `sync` 只刷新文档导航，不更新目录结构——目录结构变化频率低；若某目录变化频繁，说明它处于快速迭代期，应等稳定后再纳入 AGENTS 体系，而不是依赖 sync 反复修复。
-- `--dry-run` 时只输出各文档的导航变更预览，不写入文件。
+详细执行流程与约束见 [`check-nav`](rules/check-nav.md) 规则。
 
 ## 规则索引
 
@@ -145,6 +134,7 @@ guide 文档的位置决定其内容范围：
 |---|---|
 | 目录结构生成规则 | [`tree-generation`](rules/tree-generation.md) |
 | 文档导航生成规则 | [`docs-navigation`](rules/docs-navigation.md) |
+| 索引核验规则 | [`check-nav`](rules/check-nav.md) |
 | 配置规则 | [`config`](rules/config.md) |
 
 ## 检查清单
@@ -156,4 +146,4 @@ guide 文档的位置决定其内容范围：
 - [ ] **章节检查**：只生成必要的章节，不强求三节；无用户明确要求时不写入技术栈、架构、编码规范、测试、依赖、注意事项等章节
 - [ ] **真实性检查**：文档导航中引用的文件真实存在
 - [ ] **父级回写检查**（非根目录）：父级 guide 的文档导航中已正确添加当前目录条目，未重复添加
-- [ ] **sync 模式检查**：只重写各文档的 `## 文档导航` 章节；自底向上执行；不为缺失目录新建 `AGENTS.md`
+- [ ] **check-nav 模式检查**：只核验/修补导航章节的不一致条目，保留现有名称与说明；严格沿文档引用递进，不做引用之外的探测；默认不写文件，仅 `--fix` 时写入；不为缺失目录新建 `AGENTS.md`

@@ -8,7 +8,7 @@
 agents-guide                  # 生成项目根 AGENTS.md
 agents-guide prompts          # 生成 prompts/AGENTS.md
 agents-guide --dry-run src/payment  # 预览生成结果
-agents-guide sync             # 递归刷新范围内所有 AGENTS.md 的文档导航
+agents-guide check-nav        # 核验范围内 AGENTS.md 的文档导航层级（--fix 修补）
 agents-guide --init           # 创建配置模板（.agents.config.yaml 的 agents-guide 域）
 ```
 
