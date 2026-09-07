@@ -2,6 +2,37 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import yaml
+
+
+CONFIG_NAME = ".agents.config.yaml"
+LOCAL_CONFIG_NAME = ".agents.config.local.yaml"
+GUIDE_DOMAIN = "agents-guide"
+
+
+def read_yaml_file(config_file: Path) -> Dict[str, Any]:
+    """读取 YAML 文件；文件缺失、解析失败或顶层非映射时返回空字典。"""
+    if not config_file.is_file():
+        return {}
+    try:
+        with config_file.open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def load_guide_config(directory: Path) -> Dict[str, Any]:
+    """读取目标目录 .agents.config*.yaml 中的 agents-guide 域。
+
+    遵循 agents-config 约定：只在目标目录查找，不向上继承；
+    本技能的覆盖语义：local 文件中 agents-guide 域存在时整域替换共享层。
+    """
+    shared = read_yaml_file(directory / CONFIG_NAME).get(GUIDE_DOMAIN)
+    local = read_yaml_file(directory / LOCAL_CONFIG_NAME).get(GUIDE_DOMAIN)
+    domain = local if local is not None else shared
+    return domain if isinstance(domain, dict) else {}
+
 
 def resolve_depth(
     cli_specific: Optional[int],

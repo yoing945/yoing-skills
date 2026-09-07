@@ -1,9 +1,0 @@
-meta:
-  name: yoing-skills
-  description: 个人 AI skills 仓库
-
-scan:
-  include:
-    - .agents/
-  exclude:
-    - tests/

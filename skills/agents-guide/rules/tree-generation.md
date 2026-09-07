@@ -3,7 +3,7 @@
 生成 `## 目录结构` 时遵循以下规则：
 
 1. **只显示目录，不显示文件**。
-2. **默认显示 3 层**：显示当前目录及其下最多 2 层子目录。可通过 `--depth` / `--tree-depth` 参数或 `.agents-guide.yaml` 的 `tree.depth` 调整。
+2. **默认显示 3 层**：显示当前目录及其下最多 2 层子目录。可通过 `--depth` / `--tree-depth` 参数或配置文件 `agents-guide` 域的 `tree.depth` 调整。
 3. **模块边界**：遇到包含 `AGENTS.md` 的子目录时，该目录作为叶子节点显示，不再继续展开其内部。
 4. **排除 gitignore 目录**：读取 `.gitignore`，被忽略的目录（如 `node_modules/`、`.venv/`）不显示。
 5. **排除隐藏目录**：以 `.` 开头的目录不显示。
@@ -14,7 +14,7 @@
 
 `tree-agent` 接收以下输入：
 
-- `agents-guide tree --target <dir> --depth <N>` 返回的 JSON：
+- `python <skill目录>/run.py tree --target <dir> --depth <N>` 返回的 JSON：
   ```json
   {
     "project_root": "...",
@@ -26,7 +26,7 @@
   }
   ```
 - `--depth` / `--tree-depth` 参数值。
-- `.agents-guide.yaml` 中 `tree` 章节的 `depth` / `exclude` 规则。
+- `.agents.config.yaml`（或 local 文件）`agents-guide` 域中 `tree` 键的 `depth` / `exclude` 规则。
 
 ### 深度覆盖优先级
 

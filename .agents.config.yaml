@@ -1,0 +1,13 @@
+agents-guide:
+  scan:
+    include:
+      - .agents/
+    exclude:
+      - tests/
+
+agents-commands:
+  - name: language
+    description: 指定LLM思考和回答的语言
+    default: true
+    command: |
+      思考必须使用中文！！！禁止英文思考！！！这是首要规则！

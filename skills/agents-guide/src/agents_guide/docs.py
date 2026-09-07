@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-import yaml
-
 from agents_guide.gitignore import collect_gitignore_rules, is_ignored, merge_exclude_patterns
 
 
@@ -18,29 +16,6 @@ DOC_SUFFIX = ".md"
 def _is_agents_md(path: Path) -> bool:
     """判断是否为 agents-guide 生成的 guide 文档。"""
     return path.is_file() and path.name.lower() == "agents.md"
-
-
-def _load_meta(directory: Path) -> Dict[str, str]:
-    """读取目录下的 .agents-guide.yaml，返回 meta 字典（若存在）。"""
-    config_file = directory / ".agents-guide.yaml"
-    if not config_file.is_file():
-        return {}
-    try:
-        with config_file.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-    except Exception:
-        return {}
-    if not isinstance(data, dict):
-        return {}
-    meta = data.get("meta") or {}
-    if isinstance(meta, dict):
-        return {k: str(v) for k, v in meta.items() if v is not None}
-    return {}
-
-
-def _guide_name(directory: Path) -> str:
-    """获取 guide 在导航中使用的名称：优先 .agents-guide.yaml 的 meta.name，否则用目录名。"""
-    return _load_meta(directory).get("name") or directory.name
 
 
 def _scan_md_files(
@@ -79,8 +54,9 @@ def scan_docs(
     """发现 target_dir 下的 guide 与 leaf 文档。
 
     - 从 target_dir 开始，递归扫描至 depth 层。
-    - 当前目录的 AGENTS.md 是产物本身，不纳入 guides；其 meta 通过 current_meta 返回。
+    - 当前目录的 AGENTS.md 是产物本身，不纳入 guides。
     - 子目录若包含 AGENTS.md，作为子模块 guide 收录，且视为模块边界不再深入。
+    - 导航显示名称与说明由生成环节读取子文档标题/正文首段确定，扫描只返回事实。
     """
     target_dir = target_dir.resolve()
     project_root = project_root.resolve()
@@ -114,7 +90,6 @@ def scan_docs(
     leafs: List[Dict[str, Any]] = []
 
     # 当前目录
-    current_meta = _load_meta(target_dir)
     current_files = _scan_md_files(target_dir, project_root, spec, include_names)
 
     for f in current_files:
@@ -142,12 +117,10 @@ def scan_docs(
             sub_guide = next((f for f in sub_files if _is_agents_md(f)), None)
 
             if sub_guide:
-                sub_meta = _load_meta(subdir)
                 guides.append({
-                    "name": sub_meta.get("name") or subdir.name,
+                    "name": subdir.name,
                     "rel_path": sub_guide.relative_to(target_dir).as_posix(),
                     "source": "subdirectory",
-                    "meta": sub_meta,
                 })
                 continue
 
@@ -178,8 +151,6 @@ def scan_docs(
     return {
         "project_root": str(project_root),
         "target_dir": str(target_dir),
-        "current_meta": current_meta,
         "guides": guides,
         "leafs": leafs,
-        "config_exists": (target_dir / ".agents-guide.yaml").exists(),
     }

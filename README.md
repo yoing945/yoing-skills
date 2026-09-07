@@ -8,6 +8,7 @@
 |---|---|
 | [agents-context](skills/agents-context/SKILL.md) | 获取目录的上下文信息 |
 | [agents-commands](skills/agents-commands/SKILL.md) | 读取并执行当前目录预定义的 LLM 命令集合 |
+| [agents-config](skills/agents-config/SKILL.md) | 技能配置文件（.agents.config.yaml）统一约定 |
 | [agents-guide](skills/agents-guide/SKILL.md) | 为目录生成渐进式项目地图文档（AGENTS.md） |
 | [confmirror](skills/confmirror/SKILL.md) | ConfMirror 配置备份/还原工具 skill |
 | [ssh-context](skills/ssh-context/SKILL.md) | 读取 ssh 配置并建立远程主机连接上下文 |

@@ -9,7 +9,7 @@
 ## 排序规则
 
 1. **类型优先**：guide 文档排在 leaf 文档前面。
-2. **guide 内部**：当前目录的 guide 排在直接子目录 guide 前面；同作用域内按 `meta.name`、目录名或文件名排序。
+2. **guide 内部**：当前目录的 guide 排在直接子目录 guide 前面；同作用域内按显示名称（子文档标题或目录名）排序。
 3. **leaf 内部**：按文件名排序。
 
 ## 纳入规则
@@ -17,8 +17,8 @@
 - **guide**：当前目录下及子目录下真实存在的 `AGENTS.md`，但当前目录自身的 `AGENTS.md` 除外。
 - **leaf**：当前目录及子目录下真实存在的普通 `.md` 文件；子模块边界目录内的其他 `.md` 不纳入。
 - 排除当前正在生成的 guide 文档本身。
-- 排除 `.agents-guide.yaml`。
-- 结合 `.agents-guide.yaml` 中 `docs` 章节的 `include`/`exclude`。
+- 排除 `.agents.config.yaml` / `.agents.config.local.yaml` 等技能配置文件。
+- 结合配置文件 `agents-guide` 域中 `docs` 键的 `include`/`exclude`。
 
 ## 模块边界
 
@@ -28,23 +28,21 @@
 
 `docs-agent` 接收以下输入：
 
-- `agents-guide docs --target <dir>` 返回的 JSON：
+- `python <skill目录>/run.py docs --target <dir>` 返回的 JSON：
   ```json
   {
     "project_root": "...",
     "target_dir": "...",
-    "current_meta": {"name": "...", "description": "..."},
     "guides": [
-      {"name": "Skills", "rel_path": "skills/AGENTS.md", "source": "subdirectory", "meta": {}}
+      {"name": "skills", "rel_path": "skills/AGENTS.md", "source": "subdirectory"}
     ],
     "leafs": [
       {"name": "README", "rel_path": "README.md"}
-    ],
-    "config_exists": false
+    ]
   }
   ```
 - `--depth` / `--docs-depth` 参数值。
-- `.agents-guide.yaml` 中 `docs` 章节的 `depth` / `include` / `exclude` 规则。
+- `.agents.config.yaml`（或 local 文件）`agents-guide` 域中 `docs` 键的 `depth` / `include` / `exclude` 规则。
 
 ### 深度覆盖优先级
 

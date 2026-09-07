@@ -21,9 +21,9 @@ def test_docs_command_accepts_docs_depth(tmp_path, capsys):
 
 
 def test_tree_uses_scan_depth_and_merged_rules(tmp_path, capsys):
-    config = tmp_path / ".agents-guide.yaml"
+    config = tmp_path / ".agents.config.yaml"
     config.write_text(
-        "scan:\n  depth: 2\n  include:\n    - .agents\n  exclude:\n    - temp\n",
+        "agents-guide:\n  scan:\n    depth: 2\n    include:\n      - .agents\n    exclude:\n      - temp\n",
         encoding="utf-8",
     )
     (tmp_path / ".agents").mkdir()
@@ -43,9 +43,9 @@ def test_tree_uses_scan_depth_and_merged_rules(tmp_path, capsys):
 
 
 def test_docs_stage_depth_overrides_scan_depth(tmp_path, capsys):
-    config = tmp_path / ".agents-guide.yaml"
+    config = tmp_path / ".agents.config.yaml"
     config.write_text(
-        "scan:\n  depth: 1\ndocs:\n  depth: 2\n",
+        "agents-guide:\n  scan:\n    depth: 1\n  docs:\n    depth: 2\n",
         encoding="utf-8",
     )
     child = tmp_path / "child"
@@ -59,3 +59,26 @@ def test_docs_stage_depth_overrides_scan_depth(tmp_path, capsys):
     assert code == 0
     data = json.loads(captured.out)
     assert any(l["rel_path"] == "child/grandchild/deep.md" for l in data["leafs"])
+
+
+def test_local_config_replaces_guide_domain(tmp_path, capsys):
+    """local 文件中 guide 域存在时整域替换共享层（agents-config 约定）。"""
+    (tmp_path / ".agents.config.yaml").write_text(
+        "agents-guide:\n  scan:\n    exclude:\n      - temp\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".agents.config.local.yaml").write_text(
+        "agents-guide:\n  scan:\n    exclude:\n      - build\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "temp").mkdir()
+    (tmp_path / "build").mkdir()
+
+    code = main(["tree", "--target", str(tmp_path)])
+    captured = capsys.readouterr()
+    assert code == 0
+    data = json.loads(captured.out)
+    names = {node["name"] for node in data["directory_tree"]}
+    assert "build" not in names
+    # local 整域替换后，共享层的 temp 排除不再生效
+    assert "temp" in names

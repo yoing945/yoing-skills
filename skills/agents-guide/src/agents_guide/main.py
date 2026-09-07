@@ -4,33 +4,13 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import yaml
-
-from agents_guide.common import find_project_root, resolve_depth, _resolve_section_config
+from agents_guide.common import find_project_root, load_guide_config, resolve_depth, _resolve_section_config
 from agents_guide.docs import scan_docs
 from agents_guide.tree import scan_tree
 
 
-CONFIG_NAME = ".agents-guide.yaml"
-
-
 def _write_json(data: Dict[str, Any]) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2))
-
-
-def _load_config(target_dir: Path) -> Dict[str, Any]:
-    """读取目标目录下的 .agents-guide.yaml 配置。"""
-    config_file = target_dir / CONFIG_NAME
-    if not config_file.is_file():
-        return {}
-    try:
-        with config_file.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-    except Exception:
-        return {}
-    if not isinstance(data, dict):
-        return {}
-    return data
 
 
 def _merge_section_args(
@@ -38,7 +18,7 @@ def _merge_section_args(
     cli_exclude: List[str],
     section: Dict[str, Any],
 ) -> tuple[Optional[List[str]], Optional[List[str]]]:
-    """合并 .agents-guide.yaml 中的 include/exclude 与 CLI 参数。"""
+    """合并 guide 域配置中的 include/exclude 与 CLI 参数。"""
     include: List[str] = []
     exclude: List[str] = []
     if isinstance(section, dict):
@@ -79,7 +59,7 @@ def main(argv: Any = None) -> int:
         return 1
 
     project_root = find_project_root(target)
-    config = _load_config(target)
+    config = load_guide_config(target)
     scan_config = config.get("scan", {})
 
     if args.command == "tree":
