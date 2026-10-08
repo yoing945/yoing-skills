@@ -17,6 +17,7 @@ yoing-skills/
     ├── agents-context/     # 目录上下文统一获取
     ├── agents-commands/    # 读取并执行预定义命令集合
     ├── agents-config/      # 技能配置文件统一约定
+    ├── agents-docs/        # 文档与注释分层规范
     ├── agents-guide/       # 生成项目地图文档的 skill
     ├── confmirror/         # ConfMirror 配置备份/还原工具 skill
     └── ssh-context/        # 读取 ssh 配置并建立远程主机连接上下文
@@ -30,5 +31,6 @@ yoing-skills/
 | [prompts](prompts/AGENTS.md) | AI 行为与编码提示词 |
 | [agents-commands](skills/agents-commands/SKILL.md) | 读取并执行当前目录预定义的 LLM 命令集合 |
 | [agents-config](skills/agents-config/SKILL.md) | 技能配置文件（.agents.config.yaml）统一约定 |
+| [agents-docs](skills/agents-docs/SKILL.md) | 文档与注释分层规范：文档类型（决策/架构/调研/计划）与注释类型的归属层、禁写清单与引用协议 |
 | [待办计划](docs/TODO.md) | 项目待办事项与后续优化计划 |
 | [README](README.md) | 项目目标与主要技能 |
